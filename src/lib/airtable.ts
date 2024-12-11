@@ -54,7 +54,7 @@ export const getAvailableYSWS = async (userID: string): Promise<string[]> => {
     }
     const available = records[0].get('available_ysws') as string;
     const availableList = available ? available.split(',').map(s => s.trim()).filter(Boolean) : [];
-    console.log('Available YSWS list:', available);
+    console.log('Available YSWS list:', availableList);
     return availableList;
   } catch (error) {
     console.error('Error fetching available YSWS:', error);
