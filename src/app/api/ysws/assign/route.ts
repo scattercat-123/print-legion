@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { assignYSWSToUser } from '@/lib/airtable';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 export async function POST(request: Request) {
   try {
     console.log('Attempting to get session...');
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     console.log('Session:', session);
     
     if (!session?.user?.id) {
