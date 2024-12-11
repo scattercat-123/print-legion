@@ -1,12 +1,17 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { PrinterIcon, CheckCircleIcon, XMarkIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { YSWS } from '@/lib/airtable';
 
-export default function PrinterSelectPage() {
+type ClientComponentProps = {
+  initialData: {
+    available: string[];
+    assigned: string[];
+  };
+};
+
+const ClientComponent: React.FC<ClientComponentProps> = ({ initialData }) => {
   const router = useRouter();
   const { data: session, status } = useSession({
     required: true,
@@ -16,7 +21,7 @@ export default function PrinterSelectPage() {
   });
   const [outstandingRequests, setOutstandingRequests] = useState<YSWS[]>([]);
   const [assignedRequests, setAssignedRequests] = useState<YSWS[]>([]);
-  const [availableYSWS, setAvailableYSWS] = useState<string[]>([]);
+  const [availableYSWS, setAvailableYSWS] = useState<string[]>(initialData.available);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -265,4 +270,6 @@ export default function PrinterSelectPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ClientComponent;
