@@ -27,7 +27,7 @@ export default function SubmissionsPage() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/print-requests/user/${session.user.id}`);
+        const response = await fetch(`/api/print-requests/assigned/${session.user.id}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch submissions: ${response.statusText}`);
