@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { signIn } from "@/lib/auth";
+import { auth, signIn } from "@/lib/auth";
 import { FaSlack } from "react-icons/fa";
 import Image from "next/image";
 import cherryMX from "@media/switch.png";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export default async function LoginPage() {
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-background">
       {/* Left Section */}

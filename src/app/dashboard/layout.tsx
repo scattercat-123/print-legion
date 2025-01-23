@@ -1,14 +1,10 @@
-'use client';
+"use client";
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Briefcase,
-  Search,
-  Settings,
-  ArrowUpToLine,
-} from "lucide-react";
+import { Briefcase, Search, Settings, ArrowUpToLine } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
@@ -23,7 +19,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [active, setActive] = useState('your-jobs');
+  const pathname = usePathname();
+  const [active, setActive] = useState("your-jobs");
 
   const navItems = [
     {
@@ -32,13 +29,13 @@ export default function DashboardLayout({
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
-      href: "/dashboard/search",
+      href: "/dashboard/jobs/search",
       title: "Search Jobs",
       icon: <Search className="w-5 h-5" />,
     },
     {
-      href: "/dashboard/submit",
-      title: "Submit Jobs",
+      href: "/dashboard/jobs/create",
+      title: "Submit Job",
       icon: <ArrowUpToLine className="w-5 h-5" />,
     },
     {
@@ -57,15 +54,14 @@ export default function DashboardLayout({
           <div className="px-3 py-2">
             <div className="space-y-1">
               {navItems.slice(0, -1).map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                >
+                <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
                     className={cn(
                       "w-full justify-start gap-2 font-normal",
-                      item.href === "/dashboard" ? "bg-zinc-900 text-zinc-50" : "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
+                      item.href === pathname
+                        ? "bg-zinc-900 text-zinc-50"
+                        : "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
                     )}
                   >
                     {item.icon}
@@ -97,4 +93,4 @@ export default function DashboardLayout({
       </main>
     </div>
   );
-} 
+}
