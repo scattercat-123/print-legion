@@ -1,10 +1,11 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { createBySlackId, getBySlackId, updateBySlackId } from "@/lib/airtable";
+import { createBySlackId, getById, updateBySlackId, searchJobs } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import type { Job } from "@/lib/types";
 
 // Define a type for Airtable attachments
 interface AirtableAttachment {
@@ -21,7 +22,7 @@ export async function claimJob(jobId: string) {
     throw new Error("Not authenticated");
   }
 
-  const user = await getBySlackId("user", session.user.id);
+  const user = await getById("user", session.user.id);
   if (!user) {
     throw new Error("User not found");
   }
@@ -45,7 +46,7 @@ export async function unclaimJob(jobId: string) {
     throw new Error("Not authenticated");
   }
 
-  const job = await getBySlackId("job", jobId);
+  const job = await getById("job", jobId);
   if (!job) {
     throw new Error("Job not found");
   }
@@ -74,7 +75,7 @@ export async function updateJobStatus(jobId: string, status: string) {
     throw new Error("Not authenticated");
   }
 
-  const job = await getBySlackId("job", jobId);
+  const job = await getById("job", jobId);
   if (!job) {
     throw new Error("Job not found");
   }
@@ -103,7 +104,7 @@ export async function createJob(formData: FormData) {
     throw new Error("Not authenticated");
   }
 
-  const user = await getBySlackId("user", session.user.id);
+  const user = await getById("user", session.user.id);
   if (!user) {
     throw new Error("User not found");
   }
@@ -117,27 +118,22 @@ export async function createJob(formData: FormData) {
     10
   );
 
-  // Update the user record
-  const success = await createBySlackId("job", {
+  // Create the initial job record without files
+  const result = await createBySlackId("job", {
     slack_id: user.slack_id,
     need_printed_parts: true,
-    stls: stls.map((file) => ({
-      filename: file.name,
-      size: file.size,
-      type: file.type,
-    })) as AirtableAttachment[],
+    stls: [], // Start with empty array
     ysws,
     ysws_pr_url,
     part_count,
-    status: "pending",
   });
 
-  if (success) {
-    revalidatePath("/dashboard/jobs");
-    return { success: true };
+  if (!result.success || !result.id) {
+    throw new Error("Failed to create job");
   }
 
-  throw new Error("Failed to create job");
+  revalidatePath("/dashboard/jobs");
+  return { success: true, jobId: result.id };
 }
 
 export async function updateUserSettings(formData: FormData) {
@@ -150,7 +146,7 @@ export async function updateUserSettings(formData: FormData) {
   const available_ysws = formData.get("available_ysws")?.toString();
   const what_type = formData.get("what_type")?.toString();
   const has_printer = formData.get("has_printer")?.toString();
-  const user = await getBySlackId("user", session.user.id);
+  const user = await getById("user", session.user.id);
   if (!user) {
     const success = await createBySlackId("user", {
       slack_id: session.user.id,

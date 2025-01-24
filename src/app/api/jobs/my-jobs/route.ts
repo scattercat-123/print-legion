@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getBySlackId, searchJobs } from "@/lib/airtable";
+import { getById, searchJobs } from "@/lib/airtable";
 
 export async function GET() {
   try {
@@ -9,7 +9,7 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const user = await getBySlackId("user", session.user.id);
+    const user = await getById("user", session.user.id);
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
     }

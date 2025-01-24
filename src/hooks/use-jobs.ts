@@ -40,13 +40,13 @@ export function useMyJobs() {
 
 // Hook for infinite scrolling job search
 export function useJobSearch(query: string) {
-  const getKey = (pageIndex: number, previousPageData: Job[]) => {
+  const getKey = (pageIndex: number, previousPageData: (Job & { id: string })[]) => {
     if (previousPageData && !previousPageData.length) return null;
     return `/api/jobs/search?q=${query}&page=${pageIndex + 1}`;
   };
 
   const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<
-    Job[]
+    (Job & { id: string })[]
   >(getKey, fetcher);
 
   const jobs = data ? data.flat() : [];

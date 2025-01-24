@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getBySlackId } from "@/lib/airtable";
+import { getById } from "@/lib/airtable";
 
 export async function GET(
   request: Request,
@@ -12,7 +12,7 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const job = await getBySlackId("job", params.jobId);
+    const job = await getById("job", params.jobId);
     if (!job) {
       return new NextResponse("Job not found", { status: 404 });
     }

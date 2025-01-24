@@ -15,6 +15,7 @@ export default function SearchPage() {
   const { jobs, isLoading, isError, size, setSize, isReachingEnd } =
     useJobSearch(debouncedQuery);
 
+  console.log(jobs);
   const loadMore = useCallback(() => {
     setSize(size + 1);
   }, [setSize, size]);
@@ -54,7 +55,7 @@ export default function SearchPage() {
         <>
           <div className="grid gap-4">
             {jobs.map((job) => (
-              <JobCard key={job.slack_id} job={job} />
+              <JobCard key={job.id} job={job} />
             ))}
           </div>
 
