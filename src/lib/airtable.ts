@@ -36,7 +36,10 @@ export async function getBySlackId<T extends "job" | "user">(
       })
       .firstPage();
 
-    if (records.length === 0) return null;
+    if (records.length === 0 && type === "user") {
+      await createBySlackId(type, { slack_id: slackId });
+      return { slack_id: slackId } as User;
+    };
 
     const record = records[0];
 

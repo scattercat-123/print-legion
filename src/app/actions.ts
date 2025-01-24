@@ -118,7 +118,8 @@ export async function createJob(formData: FormData) {
   );
 
   // Update the user record
-  const success = await updateBySlackId("job", nanoid(12), {
+  const success = await createBySlackId("job", {
+    slack_id: user.slack_id,
     need_printed_parts: true,
     stls: stls.map((file) => ({
       filename: file.name,
