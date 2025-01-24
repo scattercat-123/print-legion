@@ -4,15 +4,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { claimJob, unclaimJob, updateJobStatus } from "@/app/actions";
 import { useRouter } from "next/navigation";
-import { FileBox } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { STLViewerWrapper } from "./stl-viewer";
 
 interface JobCardProps {
   job: Job;
@@ -97,34 +88,16 @@ function JobCardComponent({
         )}
       </div>
 
-      <div className="mt-2 space-x-2">
-        {job.ysws_pr_url && (
-          <a
-            href={job.ysws_pr_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-400 hover:text-blue-300 inline-block"
-          >
-            View PR →
-          </a>
-        )}
-        {job.stls && job.stls.length > 0 && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <FileBox className="w-4 h-4 mr-2" />
-                View STL
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px]">
-              <DialogHeader>
-                <DialogTitle>{job.ysws || "Job"} - STL Preview</DialogTitle>
-              </DialogHeader>
-              <STLViewerWrapper url={job.stls[0].url} />
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
+      {job.ysws_pr_url && (
+        <a
+          href={job.ysws_pr_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 text-sm text-blue-400 hover:text-blue-300 block"
+        >
+          View PR →
+        </a>
+      )}
 
       {showActions && (
         <div className="mt-4 space-x-2">
