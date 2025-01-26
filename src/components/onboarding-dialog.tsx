@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
-import { updateUser, updateUserSettings } from "@/app/actions";
+import { useRef, useState } from "react";
+import { updateUserSettings } from "@/app/actions";
 
 interface OnboardingDialogProps {
   open: boolean;
@@ -24,6 +24,10 @@ export function OnboardingDialog({
   onOpenChange,
 }: OnboardingDialogProps) {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const data = useRef<{
+    user_type?: "printer" | "requestor";
+  }>({});
 
   const stepContent = [
     {
@@ -48,23 +52,26 @@ export function OnboardingDialog({
 
   const handleContinue = async (userType?: "printer" | "requestor") => {
     if (step === 2 && userType) {
-      // Update user type in Airtable
-      const formData = new FormData();
-      formData.append("onboarded", "on");
-      formData.append("has_printer", userType === "printer" ? "on" : "off");
-      await updateUserSettings(formData);
+      data.current.user_type = userType;
     }
 
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
+      setLoading(true);
+      // Update user type in Airtable
+      const formData = new FormData();
+      formData.append("onboarded", "on");
+      formData.append("has_printer", userType === "printer" ? "on" : "off");
+      await updateUserSettings(formData);
+      setLoading(false);
       onOpenChange(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!rounded-3xl gap-0 p-1 m-2">
+    <Dialog open={open} onOpenChange={() => {}}>
+      <DialogContent className="gap-0 p-1 m-2" hasCloseButton={false}>
         <div className="space-y-6 px-6 pb-6 pt-6">
           <DialogHeader>
             <DialogTitle>{stepContent[step - 1].title}</DialogTitle>
@@ -74,7 +81,7 @@ export function OnboardingDialog({
           </DialogHeader>
 
           {step === 2 && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <Button
                 variant="outline"
                 className="w-full justify-between"
@@ -109,8 +116,12 @@ export function OnboardingDialog({
 
             {step !== 2 && (
               <DialogFooter>
-                <Button onClick={() => handleContinue()}>
-                  {step === totalSteps ? "Get Started" : "Continue"}
+                <Button onClick={() => handleContinue()} disabled={loading}>
+                  {loading
+                    ? "Saving..."
+                    : step === totalSteps
+                    ? "Get Started"
+                    : "Continue"}
                 </Button>
               </DialogFooter>
             )}
