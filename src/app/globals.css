@@ -35,6 +35,7 @@ body {
 
     --radius: 0rem;
   }
+
   .dark {
     /* --background: 240 10% 3.9%; */
     --background: 0 0% 12.7%;
@@ -68,6 +69,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

@@ -1,16 +1,16 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import {
-  createBySlackId,
-  getById,
-  updateBySlackId,
-  searchJobs,
-} from "@/lib/airtable";
+import Airtable from "airtable";
+import { createBySlackId, getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
-import { nanoid } from "nanoid";
-import type { Job, User } from "@/lib/types";
+import type { User } from "@/lib/types";
+
+// Initialize Airtable base
+const airtable = new Airtable({
+  apiKey: process.env.AIRTABLE_API_KEY,
+});
+const base = airtable.base(process.env.AIRTABLE_BASE_ID!);
 
 // Define a type for Airtable attachments
 interface AirtableAttachment {
@@ -19,6 +19,11 @@ interface AirtableAttachment {
   filename: string;
   size: number;
   type: string;
+}
+
+interface UpdateUserData {
+  onboarded?: boolean;
+  printer_has?: boolean;
 }
 
 export async function claimJob(jobId: string) {
@@ -150,9 +155,7 @@ export async function updateUserSettings(formData: FormData) {
   }
 
   // Extract form data
-  const preferred_ysws = JSON.parse(
-    formData.get("preferred_ysws")?.toString() || "[]"
-  );
+  const preferred_ysws_form = formData.get("preferred_ysws")?.toString();
   const printer_type = formData.get("printer_type")?.toString();
   const printer_details = formData.get("printer_details")?.toString();
   const has_printer = formData.get("has_printer")?.toString();
@@ -164,7 +167,9 @@ export async function updateUserSettings(formData: FormData) {
 
   const obj: User = {
     slack_id: session.user.id,
-    preferred_ysws,
+    preferred_ysws: preferred_ysws_form
+      ? JSON.parse(preferred_ysws_form)
+      : undefined,
     printer_has: has_printer === "on",
     printer_type,
     printer_details,
