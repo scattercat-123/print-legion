@@ -56,7 +56,7 @@ export default function DashboardPage({
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 !mt-8">
-        {navItems.slice(1, 4).map((action) => (
+        {navItems.slice(1, -1).map((action) => (
           <Link
             key={action.title}
             href={action.href}
