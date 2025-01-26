@@ -45,7 +45,7 @@ export function useJobSearch(query: string) {
     previousPageData: (Job & { id: string })[]
   ) => {
     if (previousPageData && !previousPageData.length) return null;
-    return `/api/jobs/search?q=${query}&page=${pageIndex + 1}`;
+    return `/api/jobs/search?q=${query}&page=${pageIndex}`;
   };
 
   const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<

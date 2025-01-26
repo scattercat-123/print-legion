@@ -18,7 +18,7 @@ export async function searchJobs({
       .select({
         filterByFormula:
           mode === "search"
-            ? `OR(SEARCH("${query}", LOWER({slack_id})), SEARCH("${query}", LOWER({ysws})))`
+            ? `OR(SEARCH("${query}", LOWER({slack_id})),SEARCH("${query}", LOWER({ysws})), SEARCH("${query}", LOWER({item_name})), SEARCH("${query}", LOWER({item_description})))`
             : query,
         offset,
         maxRecords,

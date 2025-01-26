@@ -62,22 +62,30 @@ export async function createBySlackId<T extends "job" | "user">(
 
 export async function updateBySlackId<T extends "job" | "user">(
   type: T,
-  slackId: string,
+  id: string,
   data: Partial<T extends "job" ? Job : User>
 ) {
   try {
+    let foundId: string;
     const table = type === "job" ? jobsTable : usersTable;
-    const records = await table
-      .select({
-        filterByFormula: `{slack_id} = '${slackId}'`,
-        maxRecords: 1,
-      })
-      .firstPage();
 
-    if (records.length === 0) throw new Error("Record not found");
+    if (type === "user") {
+      const records = await table
+        .select({
+          filterByFormula: `{slack_id} = '${id}'`,
+          maxRecords: 1,
+        })
+        .firstPage();
 
-    const record = records[0];
-    await table.update(record.id, data);
+      if (records.length === 0) throw new Error("Record not found");
+
+      const record = records[0];
+      foundId = record.id;
+    } else {
+      foundId = id;
+    }
+
+    await table.update(foundId, data);
     return true;
   } catch (error) {
     console.error("Error updating record:", error);

@@ -11,22 +11,21 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
-    const page = Number.parseInt(searchParams.get("page") || "1", 10);
+    const page = Number.parseInt(searchParams.get("page") || "0", 10);
 
-    const jobs = await searchJobs({ query, mode: "search" });
+    const jobs = await searchJobs({
+      query,
+      mode: "search",
+      offset: page,
+      maxRecords: 10,
+    });
 
     // Filter to only show jobs that need printing
     const availableJobs = jobs.filter(
       (job) => !job.assigned_printer_id && job.need_printed_parts
     );
 
-    // Basic pagination
-    const pageSize = 10;
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    const paginatedJobs = availableJobs.slice(start, end);
-
-    return NextResponse.json(paginatedJobs);
+    return NextResponse.json(availableJobs);
   } catch (error) {
     console.error("Error searching jobs:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

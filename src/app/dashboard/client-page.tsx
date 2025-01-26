@@ -9,19 +9,14 @@ import { getRecentActivity } from "./recent-activity.action";
 import { NavItem } from "./layout";
 
 const StatsCard = ({
-  title,
   value,
   description,
 }: {
-  title: string;
   value: number;
   description: string;
 }) => {
   return (
     <div className="rounded-lg shadow-sm border border-border p-6">
-      <h3 className="text-sm font-medium text-muted-foreground mb-2">
-        {title}
-      </h3>
       <p className="text-3xl font-bold text-foreground">{value}</p>
       <p className="text-sm text-muted-foreground">{description}</p>
     </div>
@@ -45,7 +40,7 @@ export default function DashboardPage({
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-8">
+    <div className="space-y-4 max-w-7xl mx-auto pb-8">
       {/* Welcome Section */}
       <div className="bg-gradient-to-br from-purple-300 to-purple-900 rounded-lg text-white relative">
         <div className="absolute w-full h-full block bg-black/30"></div>
@@ -60,12 +55,12 @@ export default function DashboardPage({
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 md-lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 !mt-8">
         {navItems.slice(1, 4).map((action) => (
           <Link
             key={action.title}
             href={action.href}
-            className="block group hover:scale-[1.02] transition-transform"
+            className="block group transition-transform"
           >
             <div className="rounded-lg shadow-sm border border-border hover:bg-card transition-colors px-5 py-4 flex items-center space-x-4">
               <div className={`${action.color} p-2 rounded-lg text-white`}>
@@ -80,19 +75,16 @@ export default function DashboardPage({
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatsCard
-          title="Recent Activity"
           value={recentActivity.stats.lastHourModifications || 0}
-          description="jobs modified in the last hour"
+          description="jobs modified >1h ago"
         />
         <StatsCard
-          title="Active Jobs"
           value={recentActivity.stats.totalActiveJobs || 0}
           description="jobs in progress"
         />
         <StatsCard
-          title="Completed Jobs"
           value={recentActivity.stats.totalCompletedJobs || 0}
           description="jobs completed"
         />
@@ -100,11 +92,11 @@ export default function DashboardPage({
 
       {/* Recent Jobs */}
       {recentActivity?.recentJobs && recentActivity.recentJobs.length > 0 && (
-        <div>
+        <div className="!mt-8">
           <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
           <div className="grid gap-4">
             {recentActivity.recentJobs.map((job) => (
-              <JobCard key={job.id} job={job} isAssigned={true} />
+              <JobCard key={job.id} job={job} />
             ))}
           </div>
         </div>
