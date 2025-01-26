@@ -62,10 +62,13 @@ export function OnboardingDialog({
       setStep(step + 1);
     } else {
       setLoading(true);
-      // Update user type in Airtable
+      // tldr do everything at the end, since the action may cause a page refresh otherwise
       const formData = new FormData();
       formData.append("onboarded", "on");
-      formData.append("has_printer", userType === "printer" ? "on" : "off");
+      formData.append(
+        "has_printer",
+        data.current.user_type === "printer" ? "on" : "off"
+      );
       await updateUserSettings(formData);
       setLoading(false);
       onOpenChange(false);
