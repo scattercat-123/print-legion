@@ -21,7 +21,7 @@ export const UserSchema = z.object({
   printer_has: z.boolean().default(false).optional(),
   printer_type: z.string().optional(),
   printer_details: z.string().optional(),
-  available_ysws: z.array(z.string()).optional(),
+  preferred_ysws: z.array(z.string()).optional(),
   onboarded: z.boolean().default(false).optional(),
   // lat,lon e.g "40.7128,-74.0060"
   region_coordinates: z
