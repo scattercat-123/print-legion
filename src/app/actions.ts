@@ -1,7 +1,12 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { createBySlackId, getById, updateBySlackId, searchJobs } from "@/lib/airtable";
+import {
+  createBySlackId,
+  getById,
+  updateBySlackId,
+  searchJobs,
+} from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { nanoid } from "nanoid";
