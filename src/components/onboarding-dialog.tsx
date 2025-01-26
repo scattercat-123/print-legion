@@ -31,17 +31,20 @@ export function OnboardingDialog({
 
   const stepContent = [
     {
+      id: "welcome",
       title: "Welcome to Hack Club Launchpad!",
       description:
         "This platform connects Hack Clubbers who need 3D printed parts with those who can print them.",
     },
     {
+      id: "user_type",
       title: "How would you like to participate?",
       description:
         "Are you looking to have parts printed, or would you like to help print parts for others?",
       action: "user_type",
     },
     {
+      id: "celebrate",
       title: "You're all set!",
       description:
         "You can now start using Launchpad. Click 'Get Started' to begin your journey!",
@@ -103,9 +106,9 @@ export function OnboardingDialog({
 
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex justify-center space-x-1.5">
-              {[...Array(totalSteps)].map((_, index) => (
+              {stepContent.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.id}
                   className={cn(
                     "h-1.5 w-1.5 rounded-full bg-primary",
                     index + 1 === step ? "bg-primary" : "opacity-20"
