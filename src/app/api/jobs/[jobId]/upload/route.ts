@@ -33,28 +33,30 @@ export async function POST(
     const buffer = await file.arrayBuffer();
 
     // Upload to Airtable
-    const response = await fetch(`https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/stls/uploadAttachment`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        "Content-Type": 'application/json',
-      },
-      body: JSON.stringify({
-        contentType: file.type,
-        file: Buffer.from(buffer).toString("base64"),
-        filename: file.name,
-      }),
-    });
+    const response = await fetch(
+      `https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/stls/uploadAttachment`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contentType: file.type,
+          file: Buffer.from(buffer).toString("base64"),
+          filename: file.name,
+        }),
+      }
+    );
 
     if (!response.ok) {
       console.error("Airtable upload failed:", await response.text());
       return new NextResponse("Failed to upload file", { status: 500 });
     }
 
-
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error handling file upload:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
-} 
+}

@@ -1,68 +1,100 @@
-"use client";
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Search, Settings, ArrowUpToLine } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { OnboardingDialog } from "@/components/onboarding-dialog";
-import { checkOnboardingStatus } from "@/app/actions";
+import {
+  Briefcase,
+  Search,
+  Settings,
+  ArrowUpToLine,
+  Printer,
+  HomeIcon,
+} from "lucide-react";
+import { auth } from "@/lib/auth";
+import { getById } from "@/lib/airtable";
+import { redirect } from "next/navigation";
+import { cache } from "react";
+import type { User } from "@/lib/types";
+import { OnboardingWrapper } from "./onboarding";
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  items: {
-    href: string;
-    title: string;
-    icon: React.ReactNode;
-  }[];
-}
+export const cached_getById = cache(getById);
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pathname = usePathname();
-  const [active, setActive] = useState("your-jobs");
-  const [showOnboarding, setShowOnboarding] = useState(false);
+export type NavItem = {
+  href: string;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+};
 
-  const navItems = [
+export const computeNavItems = (user: User) => {
+  return [
     {
       href: "/dashboard",
-      title: "Your Jobs",
-      icon: <Briefcase className="w-5 h-5" />,
+      title: "Dashboard",
+      icon: <HomeIcon className="w-5 h-5" />,
+      color: "bg-black",
     },
+    ...(user?.printer_has
+      ? [
+          {
+            href: "/dashboard/prints",
+            title: "Your Prints",
+            icon: <Printer className="w-5 h-5" />,
+            color: "bg-green-500",
+          },
+        ]
+      : []),
+    ...(!user?.printer_has || user?.has_ever_submitted
+      ? [
+          {
+            href: "/dashboard/submissions",
+            title: "Your Submissions",
+            icon: <Briefcase className="w-5 h-5" />,
+            color: "bg-purple-500",
+          },
+        ]
+      : []),
+
     {
       href: "/dashboard/jobs/search",
-      title: "Search Jobs",
+      title: "Search Prints",
       icon: <Search className="w-5 h-5" />,
+      color: "bg-red-500",
     },
-    {
-      href: "/dashboard/jobs/create",
-      title: "Submit Job",
-      icon: <ArrowUpToLine className="w-5 h-5" />,
-    },
+    ...(!user?.printer_has
+      ? [
+          {
+            href: "/dashboard/jobs/create",
+            title: "Submit Job",
+            icon: <ArrowUpToLine className="w-5 h-5" />,
+            color: "bg-orange-500",
+          },
+        ]
+      : []),
     {
       href: "/dashboard/settings",
       title: "Settings",
       icon: <Settings className="w-5 h-5" />,
+      color: "bg-blue-500",
     },
-  ];
+  ] satisfies NavItem[];
+};
 
-  useEffect(() => {
-    const checkStatus = async () => {
-      const { needsOnboarding } = await checkOnboardingStatus();
-      setShowOnboarding(needsOnboarding);
-    };
-
-    checkStatus();
-  }, []);
-
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/");
+  }
+  const user = (await cached_getById("user", session.user.id)) as User;
+  if (!user) {
+    redirect("/");
+  }
+  const navItems = computeNavItems(user);
   return (
-    <>
-      <OnboardingDialog
-        open={showOnboarding}
-        onOpenChange={setShowOnboarding}
-      />
+    <OnboardingWrapper user={user}>
       <div className="flex h-screen overflow-hidden bg-black">
         {/* Sidebar */}
         <div className="w-64 border-r border-zinc-800">
@@ -76,9 +108,7 @@ export default function DashboardLayout({
                       variant="ghost"
                       className={cn(
                         "w-full justify-start gap-2 font-normal",
-                        item.href === pathname
-                          ? "bg-zinc-900 text-zinc-50"
-                          : "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
+                        "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
                       )}
                     >
                       {item.icon}
@@ -91,13 +121,13 @@ export default function DashboardLayout({
 
             {/* Bottom section with settings */}
             <div className="px-3 py-2">
-              <Link href={navItems[3].href}>
+              <Link href={navItems[navItems.length - 1].href}>
                 <Button
                   variant="ghost"
                   className="w-full justify-start gap-2 font-normal text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
                 >
-                  {navItems[3].icon}
-                  {navItems[3].title}
+                  {navItems[navItems.length - 1].icon}
+                  {navItems[navItems.length - 1].title}
                 </Button>
               </Link>
             </div>
@@ -109,6 +139,6 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
-    </>
+    </OnboardingWrapper>
   );
 }

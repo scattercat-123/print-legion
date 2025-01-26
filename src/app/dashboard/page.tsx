@@ -1,43 +1,29 @@
-"use client";
+import { useSession } from "next-auth/react";
+import DashboardPage from "./client-page";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getRecentActivity } from "./recent-activity.action";
+import { cache } from "react";
+import { User } from "@/lib/types";
+import { cached_getById, computeNavItems } from "./layout";
 
-import { useMyJobs } from "@/hooks/use-jobs";
-import { JobCard } from "@/components/job-card";
-
-export default function JobsPage() {
-  const { jobs, isLoading, isError } = useMyJobs();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-zinc-400">Loading jobs...</p>
-      </div>
-    );
+const cachedRecentActivity = cache(getRecentActivity);
+export default async function Page() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return redirect("/signin");
   }
-
-  if (isError) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-red-400">Error loading jobs</p>
-      </div>
-    );
+  const user = (await cached_getById("user", session.user.id)) as User;
+  if (!user) {
+    return redirect("/signin");
   }
-
-  if (jobs.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-zinc-400">No jobs found</p>
-      </div>
-    );
-  }
-
+  const navItems = computeNavItems(user);
+  const recentActivity = await cachedRecentActivity();
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Your Jobs</h1>
-      <div className="grid gap-4">
-        {jobs.map((job) => (
-          <JobCard key={job.slack_id} job={job} isAssigned={true} />
-        ))}
-      </div>
-    </div>
+    <DashboardPage
+      session={session}
+      recentActivity={recentActivity}
+      navItems={navItems}
+    />
   );
 }
