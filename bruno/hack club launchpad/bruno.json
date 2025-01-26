@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "hack club launchpad",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}

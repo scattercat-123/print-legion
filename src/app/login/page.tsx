@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { auth, signIn } from "@/lib/auth";
+import { signIn } from "@/lib/auth";
 import { FaSlack } from "react-icons/fa";
 import Image from "next/image";
 import cherryMX from "@media/switch.png";
-import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
   return (
@@ -14,7 +13,7 @@ export default async function LoginPage() {
           <div className="space-y-2">
             <h1 className="text-4xl font-bold tracking-tighter">
               <span className="text-foreground">&gt; </span>
-              printfarm_
+              ./print_legion
             </h1>
             <p className="text-muted-foreground">
               <span className="text-foreground">$</span> Please authenticate to

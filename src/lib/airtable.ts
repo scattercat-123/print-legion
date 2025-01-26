@@ -1,4 +1,4 @@
-import Airtable, { FieldSet, Record } from "airtable";
+import Airtable, { type FieldSet, type Record } from "airtable";
 import type { User, Job } from "./types";
 import { UserSchema, JobSchema } from "./types";
 import { z } from "zod";
@@ -26,14 +26,13 @@ const usersTable = base("Users");
 export async function getById<T extends "job" | "user">(
   type: T,
   id: string
-): Promise<(T extends "job" ? Job : User) & { id: string } | null> {
+): Promise<((T extends "job" ? Job : User) & { id: string }) | null> {
   console.log(`[getById] ${type} ${id}`);
   try {
     let record: Record<FieldSet>;
     if (type === "user") {
       const records = await usersTable
         .select({
-
           filterByFormula: `{slack_id} = '${id}'`,
           maxRecords: 1,
         })
@@ -48,6 +47,7 @@ export async function getById<T extends "job" | "user">(
     } else {
       record = await jobsTable.find(id);
     }
+
     const parsed = (type === "job" ? JobSchema : UserSchema).safeParse(
       record.fields
     );
@@ -55,7 +55,9 @@ export async function getById<T extends "job" | "user">(
       console.error("Failed to parse record:", parsed.error);
       return null;
     }
-    return { ...parsed.data, id: record.id } as (T extends "job" ? Job : User) & {
+    return { ...parsed.data, id: record.id } as unknown as (T extends "job"
+      ? Job
+      : User) & {
       id: string;
     };
   } catch (error) {
