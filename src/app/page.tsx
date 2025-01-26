@@ -1,8 +1,10 @@
-export default function Home() {
-  return (
-    <div>
-      <h1 className="mb-6 text-2xl font-semibold">Your Jobs</h1>
-      test hello hi
-    </div>
-  );
+import { auth } from "@/lib/auth";
+import { redirect, RedirectType } from "next/navigation";
+
+export default async function Home() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return redirect("/login", RedirectType.replace);
+  }
+  return redirect("/dashboard", RedirectType.replace);
 }
