@@ -23,10 +23,10 @@ export function useJob(jobId: string) {
   };
 }
 
-// Hook for fetching user's assigned jobs
-export function useMyJobs() {
+// Combined hook for fetching user's jobs (prints or submissions)
+export function useMyJobs(type: "prints" | "submissions") {
   const { data, error, isLoading, mutate } = useSWR<Job[]>(
-    "/api/jobs/my-jobs",
+    `/api/jobs/my-jobs?type=${type}`,
     fetcher
   );
 
@@ -40,9 +40,12 @@ export function useMyJobs() {
 
 // Hook for infinite scrolling job search
 export function useJobSearch(query: string) {
-  const getKey = (pageIndex: number, previousPageData: (Job & { id: string })[]) => {
+  const getKey = (
+    pageIndex: number,
+    previousPageData: (Job & { id: string })[]
+  ) => {
     if (previousPageData && !previousPageData.length) return null;
-    return `/api/jobs/search?q=${query}&page=${pageIndex + 1}`;
+    return `/api/jobs/search?q=${query}&page=${pageIndex}`;
   };
 
   const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<
@@ -63,3 +66,7 @@ export function useJobSearch(query: string) {
     mutate,
   };
 }
+
+// Convenience hooks for better DX
+export const useMyPrints = () => useMyJobs("prints");
+export const useMySubmissions = () => useMyJobs("submissions");

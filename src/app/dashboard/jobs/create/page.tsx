@@ -53,7 +53,11 @@ export default function CreateJobPage() {
       router.refresh();
     } catch (error) {
       console.error("Failed to create job:", error);
-      addProgress(`Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`);
+      addProgress(
+        `Error: ${
+          error instanceof Error ? error.message : "Unknown error occurred"
+        }`
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -126,8 +130,14 @@ export default function CreateJobPage() {
 
           {progress.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-2">Progress</label>
+              <label
+                className="block text-sm font-medium mb-2"
+                htmlFor="progress"
+              >
+                Progress
+              </label>
               <Textarea
+                id="progress"
                 value={progress.join("\n")}
                 readOnly
                 className="h-32 font-mono text-sm bg-zinc-900"

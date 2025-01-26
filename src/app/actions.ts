@@ -1,11 +1,16 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { createBySlackId, getById, updateBySlackId, searchJobs } from "@/lib/airtable";
+import {
+  createBySlackId,
+  getById,
+  updateBySlackId,
+  searchJobs,
+} from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import type { Job } from "@/lib/types";
+import type { Job, User } from "@/lib/types";
 
 // Define a type for Airtable attachments
 interface AirtableAttachment {
@@ -69,7 +74,10 @@ export async function unclaimJob(jobId: string) {
   throw new Error("Failed to unclaim job");
 }
 
-export async function updateJobStatus(jobId: string, status: string) {
+export async function updateJobStatus(
+  jobId: string,
+  status: "in_progress" | "done" | "cancelled"
+) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Not authenticated");
@@ -110,8 +118,7 @@ export async function createJob(formData: FormData) {
   }
 
   // Extract form data
-  const stls = formData.getAll("stls") as File[];
-  const ysws = formData.get("ysws")?.toString();
+  const ysws = JSON.parse(formData.get("ysws")?.toString() || "[]");
   const ysws_pr_url = formData.get("ysws_pr_url")?.toString();
   const part_count = Number.parseInt(
     formData.get("part_count")?.toString() || "0",
@@ -143,16 +150,30 @@ export async function updateUserSettings(formData: FormData) {
   }
 
   // Extract form data
-  const available_ysws = formData.get("available_ysws")?.toString();
-  const what_type = formData.get("what_type")?.toString();
+  const preferred_ysws = JSON.parse(
+    formData.get("preferred_ysws")?.toString() || "[]"
+  );
+  const printer_type = formData.get("printer_type")?.toString();
+  const printer_details = formData.get("printer_details")?.toString();
   const has_printer = formData.get("has_printer")?.toString();
+  const region_coordinates = formData.get("region_coordinates")?.toString();
   const user = await getById("user", session.user.id);
+  const onboarded = formData.get("onboarded")
+    ? formData.get("onboarded") === "on"
+    : undefined;
+
+  const obj: User = {
+    slack_id: session.user.id,
+    preferred_ysws,
+    printer_has: has_printer === "on",
+    printer_type,
+    printer_details,
+    onboarded,
+    region_coordinates,
+  };
+
   if (!user) {
-    const success = await createBySlackId("user", {
-      slack_id: session.user.id,
-      available_ysws,
-      "What Type?": what_type,
-    });
+    const success = await createBySlackId("user", obj);
     if (!success) {
       throw new Error("Failed to create user");
     }
@@ -160,11 +181,7 @@ export async function updateUserSettings(formData: FormData) {
   }
 
   // Update the printer record
-  const success = await updateBySlackId("user", session.user.id, {
-    available_ysws,
-    "What Type?": what_type,
-    printer_has: has_printer === "on",
-  });
+  const success = await updateBySlackId("user", session.user.id, obj);
 
   if (success) {
     revalidatePath("/dashboard/settings");
