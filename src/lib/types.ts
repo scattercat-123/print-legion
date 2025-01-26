@@ -15,6 +15,7 @@ export const JobSchema = z.object({
   status: JobStatus.optional(),
   item_name: z.string().optional(),
   item_description: z.string().optional(),
+  last_modified: z.string().optional(),
 });
 
 // Printer table schema

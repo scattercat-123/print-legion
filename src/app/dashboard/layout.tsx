@@ -7,6 +7,7 @@ import {
   Settings,
   ArrowUpToLine,
   Printer,
+  HomeIcon,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getById } from "@/lib/airtable";
@@ -14,7 +15,68 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import type { User } from "@/lib/types";
 
-const cached_getById = cache(getById);
+export const cached_getById = cache(getById);
+
+export type NavItem = {
+  href: string;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+};
+
+export const computeNavItems = (user: User) => {
+  return [
+    {
+      href: "/dashboard",
+      title: "Dashboard",
+      icon: <HomeIcon className="w-5 h-5" />,
+      color: "bg-black",
+    },
+    ...(user?.printer_has
+      ? [
+          {
+            href: "/dashboard/prints",
+            title: "Your Prints",
+            icon: <Printer className="w-5 h-5" />,
+            color: "bg-green-500",
+          },
+        ]
+      : []),
+    ...(!user?.printer_has || user?.has_ever_submitted
+      ? [
+          {
+            href: "/dashboard/submissions",
+            title: "Your Submissions",
+            icon: <Briefcase className="w-5 h-5" />,
+            color: "bg-purple-500",
+          },
+        ]
+      : []),
+
+    {
+      href: "/dashboard/jobs/search",
+      title: "Search Prints",
+      icon: <Search className="w-5 h-5" />,
+      color: "bg-red-500",
+    },
+    ...(!user?.printer_has
+      ? [
+          {
+            href: "/dashboard/jobs/create",
+            title: "Submit Job",
+            icon: <ArrowUpToLine className="w-5 h-5" />,
+            color: "bg-orange-500",
+          },
+        ]
+      : []),
+    {
+      href: "/dashboard/settings",
+      title: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      color: "bg-blue-500",
+    },
+  ] satisfies NavItem[];
+};
 
 export default async function DashboardLayout({
   children,
@@ -29,48 +91,7 @@ export default async function DashboardLayout({
   if (!user) {
     redirect("/");
   }
-
-  const navItems = [
-    ...(user?.printer_has
-      ? [
-          {
-            href: "/dashboard/prints",
-            title: "Your Prints",
-            icon: <Printer className="w-5 h-5" />,
-          },
-        ]
-      : []),
-    ...(!user?.printer_has || user?.has_ever_submitted
-      ? [
-          {
-            href: "/dashboard/submissions",
-            title: "Your Submissions",
-            icon: <Briefcase className="w-5 h-5" />,
-          },
-        ]
-      : []),
-
-    {
-      href: "/dashboard/jobs/search",
-      title: "Search Prints",
-      icon: <Search className="w-5 h-5" />,
-    },
-    ...(!user?.printer_has
-      ? [
-          {
-            href: "/dashboard/jobs/create",
-            title: "Submit Job",
-            icon: <ArrowUpToLine className="w-5 h-5" />,
-          },
-        ]
-      : []),
-    {
-      href: "/dashboard/settings",
-      title: "Settings",
-      icon: <Settings className="w-5 h-5" />,
-    },
-  ];
-
+  const navItems = computeNavItems(user);
   return (
     <div className="flex h-screen overflow-hidden bg-black">
       {/* Sidebar */}
