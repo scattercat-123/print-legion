@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const query = searchParams.get("q") || "";
     const page = Number.parseInt(searchParams.get("page") || "1", 10);
 
-    const jobs = await searchJobs(query);
+    const jobs = await searchJobs({ query, mode: "search" });
 
     // Filter to only show jobs that need printing
     const availableJobs = jobs.filter(

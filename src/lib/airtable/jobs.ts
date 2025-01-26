@@ -2,15 +2,28 @@ import { jobsTable } from ".";
 import { JobSchema, type Job } from "../types";
 
 // Search helper
-export async function searchJobs(query?: string) {
+export async function searchJobs({
+  query,
+  mode = "search",
+  offset = 0,
+  maxRecords = 25,
+}: {
+  query?: string;
+  mode?: "search" | "formula";
+  offset?: number;
+  maxRecords?: number;
+}) {
   try {
     const records = await jobsTable
       .select({
-        filterByFormula: query
-          ? `OR(SEARCH("${query}", LOWER({slack_id})), SEARCH("${query}", LOWER({ysws})))`
-          : "",
+        filterByFormula:
+          mode === "search"
+            ? `OR(SEARCH("${query}", LOWER({slack_id})), SEARCH("${query}", LOWER({ysws})))`
+            : query,
+        offset,
+        maxRecords,
       })
-      .firstPage();
+      .all();
 
     return records
       .map((record) => {

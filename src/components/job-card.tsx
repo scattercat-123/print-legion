@@ -1,3 +1,4 @@
+"use client";
 import React, { memo } from "react";
 import type { Job } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -55,7 +56,9 @@ function JobCardComponent({
     }
   };
 
-  const handleStatusUpdate = async (status: string) => {
+  const handleStatusUpdate = async (
+    status: "in_progress" | "done" | "cancelled"
+  ) => {
     try {
       await updateJobStatus(job.slack_id, status);
       router.refresh();
@@ -115,7 +118,7 @@ function JobCardComponent({
                 Start Printing
               </Button>
               <Button
-                onClick={() => handleStatusUpdate("completed")}
+                onClick={() => handleStatusUpdate("done")}
                 variant="outline"
                 size="sm"
               >

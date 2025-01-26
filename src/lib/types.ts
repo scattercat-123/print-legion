@@ -13,6 +13,8 @@ export const JobSchema = z.object({
   ysws_pr_url: z.string().optional(),
   assigned_printer_id: z.string().optional(),
   status: JobStatus.optional(),
+  item_name: z.string().optional(),
+  item_description: z.string().optional(),
 });
 
 // Printer table schema
@@ -23,6 +25,7 @@ export const UserSchema = z.object({
   printer_details: z.string().optional(),
   preferred_ysws: z.array(z.string()).optional(),
   onboarded: z.boolean().default(false).optional(),
+  has_ever_submitted: z.boolean().default(false).optional(),
   // lat,lon e.g "40.7128,-74.0060"
   region_coordinates: z
     .string()
