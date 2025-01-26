@@ -8,7 +8,7 @@ export const JobSchema = z.object({
   part_count: z.number().optional(),
   status: z.string().optional(),
   stls: z.array(z.any()).optional(), // Airtable attachments
-  ysws: z.string().optional(),
+  ysws: z.array(z.any()).optional(), // YSWS can be an array
   ysws_pr_url: z.string().optional(),
 });
 
@@ -20,6 +20,8 @@ export const UserSchema = z.object({
   has_been_picked: z.boolean().default(false).optional(),
   printer_has: z.boolean().default(false).optional(),
   "What Type?": z.string().optional(),
+  onboarded: z.boolean().default(false).optional(),
+  user_type: z.enum(["printer", "requestor"]).optional(),
 });
 
 // Infer types from schemas

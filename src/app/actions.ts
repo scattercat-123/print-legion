@@ -2,10 +2,17 @@
 
 import { auth } from "@/lib/auth";
 import { createBySlackId, getById, updateBySlackId, searchJobs } from "@/lib/airtable";
+import Airtable from "airtable";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import type { Job } from "@/lib/types";
+
+// Initialize Airtable base
+const airtable = new Airtable({
+  apiKey: process.env.AIRTABLE_API_KEY,
+});
+const base = airtable.base(process.env.AIRTABLE_BASE_ID!);
 
 // Define a type for Airtable attachments
 interface AirtableAttachment {
@@ -14,6 +21,11 @@ interface AirtableAttachment {
   filename: string;
   size: number;
   type: string;
+}
+
+interface UpdateUserData {
+  onboarded?: boolean;
+  printer_has?: boolean;
 }
 
 export async function claimJob(jobId: string) {
@@ -172,4 +184,38 @@ export async function updateUserSettings(formData: FormData) {
   }
 
   throw new Error("Failed to update settings");
+}
+
+export async function updateUser(data: UpdateUserData) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+
+  const records = await base("Users")
+    .select({
+      filterByFormula: `{slack_id} = '${session.user.id}'`,
+    })
+    .firstPage();
+
+  if (!records.length) throw new Error("User not found");
+
+  await base("Users").update([
+    {
+      id: records[0].id,
+      fields: {
+        ...(data.user_type && { "What Type?": data.user_type }),
+        ...(data.onboarded !== undefined && { onboarded: data.onboarded }),
+        ...(data.printer_has !== undefined && { printer_has: data.printer_has }),
+      },
+    },
+  ]);
+
+  return { success: true };
+}
+
+export async function checkOnboardingStatus() {
+  const session = await auth();
+  if (!session?.user?.id) return { needsOnboarding: false };
+
+  const user = await getById("user", session.user.id);
+  return { needsOnboarding: !user?.onboarded };
 }
