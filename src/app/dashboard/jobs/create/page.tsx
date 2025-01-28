@@ -64,10 +64,28 @@ export default function CreateJobPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h1 className="text-2xl font-semibold">Create New Job</h1>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-2xl font-semibold">Submit Job</h1>
+      <div className="mt-1.5 text-sm border-border/50 border px-3 py-1.5 text-muted-foreground">
+        <b>How does this work?</b>
+        <ul className="space-y-1 list-decimal list-inside text-xs">
+          <li>
+            Fill out the form below with the details of the thing you want
+            printed.
+          </li>
+          <li>Upload the STL files, images, etc. Submit!</li>
+          <li>
+            Somebody in your area may claim the job and print it - you can
+            monitor your print's progress in the dashboard.
+          </li>
+          <li>
+            You'll communicate with the person who prints your job via Slack to
+            arrange pickup.
+          </li>
+        </ul>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 mt-4">
         <div className="space-y-4">
           <div>
             <label htmlFor="ysws" className="block text-sm font-medium mb-2">
