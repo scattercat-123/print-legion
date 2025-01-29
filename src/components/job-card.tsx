@@ -1,5 +1,5 @@
 "use client";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import type { Job } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -36,6 +36,18 @@ function JobCardComponent({
         return "bg-zinc-500/20 text-zinc-500";
     }
   };
+
+  const thumbnailUrl = useMemo(() => {
+    if (!job?.user_images || job.user_images.length < 1) {
+      return undefined;
+    }
+
+    const main_image_id = job.main_image_id;
+    const main_image =
+      job.user_images.find((image) => image.id === main_image_id) ??
+      job.user_images[0];
+    return main_image?.thumbnails?.large?.url ?? main_image?.url;
+  }, [job.main_image_id, job.stls, job.user_images]);
 
   return (
     <div
@@ -97,13 +109,16 @@ function JobCardComponent({
           )}
         </div>
       </div>
-      <div className="w-full max-w-[7.375rem] hidden md:flex">
-        <img
-          src={`https://picsum.photos/400/400?random=${job.id}`}
-          alt="Job"
-          className="size-[7.375rem] object-contain shrink rounded-md"
-        />
-      </div>
+      {thumbnailUrl && (
+        <div className="w-full max-w-[7.375rem] hidden md:flex">
+          <img
+            // src={`https://picsum.photos/400/400?random=${job.id}`}
+            src={thumbnailUrl}
+            alt="Job"
+            className="size-[7.375rem] object-contain shrink rounded-md border-dashed border border-border"
+          />
+        </div>
+      )}
     </div>
   );
 }

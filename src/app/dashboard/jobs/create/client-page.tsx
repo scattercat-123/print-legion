@@ -515,7 +515,7 @@ function PureCreateJobPage() {
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-semibold">Submit Job</h1>
       {!isSubmitting && (
-        <div className="mt-1.5 text-sm border-border/50 border px-3 py-1.5 text-muted-foreground">
+        <div className="mt-1.5 text-sm border-border/50 border px-3 py-1.5 text-muted-foreground rounded-md">
           <b>How does this work?</b>
           <ul className="space-y-1 list-decimal list-inside text-xs">
             <li>
