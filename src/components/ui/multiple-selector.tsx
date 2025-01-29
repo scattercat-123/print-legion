@@ -87,6 +87,7 @@ interface MultipleSelectorProps {
 
 export interface MultipleSelectorRef {
   selectedValue: Option[];
+  setSelectedValue: (value: Option[]) => void;
   input: HTMLInputElement;
   focus: () => void;
   reset: () => void;
@@ -219,6 +220,7 @@ const MultipleSelector = React.forwardRef<
       ref,
       () => ({
         selectedValue: [...selected],
+        setSelectedValue: (value: Option[]) => setSelected(value),
         input: inputRef.current as HTMLInputElement,
         focus: () => inputRef?.current?.focus(),
         reset: () => setSelected([]),
@@ -426,7 +428,7 @@ const MultipleSelector = React.forwardRef<
           commandProps?.onKeyDown?.(e);
         }}
         className={cn(
-          "h-auto overflow-visible bg-transparent",
+          "h-auto overflow-visible bg-card text-card-foreground",
           commandProps?.className
         )}
         shouldFilter={
@@ -436,11 +438,12 @@ const MultipleSelector = React.forwardRef<
         }
         filter={commandFilter()}
       >
+        {/* biome-ignore lint/nursery/noStaticElementInteractions: <explanation> */}
         <div
           className={cn(
-            "min-h-10 rounded-md border border-input text-base md:text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 w-[300px]",
+            "min-h-10 rounded-md border border-input hover:border-primary/40 focus-visible:border-transparent transition-colors text-base md:text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring w-[300px]",
             {
-              "px-3 py-2": selected.length !== 0,
+              "px-2 py-2": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,
             },
             className
@@ -464,6 +467,8 @@ const MultipleSelector = React.forwardRef<
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                     "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
                     option.img_url && "pl-1",
+                    maxSelected === 1 &&
+                      "bg-transparent p-0 hover:bg-transparent text-foreground text-sm font-normal",
                     badgeClassName
                   )}
                   data-fixed={option.fixed}
@@ -473,14 +478,18 @@ const MultipleSelector = React.forwardRef<
                     <img
                       src={option.img_url}
                       alt={option.label}
-                      className="w-4 h-4 rounded-sm mr-1"
+                      className={cn(
+                        "size-4 rounded-sm mr-1",
+                        maxSelected === 1 && "size-5 mr-1.5"
+                      )}
                     />
                   )}
                   {option.label}
                   <button
                     className={cn(
                       "ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                      (disabled || option.fixed) && "hidden"
+                      (disabled || option.fixed) && "hidden",
+                      maxSelected === 1 && "hidden"
                     )}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -541,7 +550,7 @@ const MultipleSelector = React.forwardRef<
                 onChange?.(selected.filter((s) => s.fixed));
               }}
               className={cn(
-                "absolute right-0 h-6 w-6 p-0",
+                "absolute right-0 h-6 w-6 p-0 flex items-center justify-center",
                 (hideClearAllButton ||
                   disabled ||
                   selected.length < 1 ||
@@ -549,7 +558,7 @@ const MultipleSelector = React.forwardRef<
                   "hidden"
               )}
             >
-              <X />
+              <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
             </button>
           </div>
         </div>
@@ -593,14 +602,24 @@ const MultipleSelector = React.forwardRef<
                               e.stopPropagation();
                             }}
                             onSelect={() => {
-                              if (selected.length >= maxSelected) {
+                              if (
+                                selected.length >= maxSelected &&
+                                maxSelected !== 1
+                              ) {
                                 onMaxSelected?.(selected.length);
                                 return;
                               }
                               setInputValue("");
-                              const newOptions = [...selected, option];
-                              setSelected(newOptions);
-                              onChange?.(newOptions);
+                              if (maxSelected === 1) {
+                                const newOptions = [option];
+                                setSelected(newOptions);
+                                onChange?.(newOptions);
+                              } else {
+                                const newOptions = [...selected, option];
+                                setSelected(newOptions);
+
+                                onChange?.(newOptions);
+                              }
                             }}
                             className={cn(
                               "cursor-pointer",

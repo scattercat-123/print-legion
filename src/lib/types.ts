@@ -10,12 +10,16 @@ export const JobSchema = z.object({
   need_printed_parts: z.boolean().default(true).optional(),
   part_count: z.number().optional(),
   stls: z.array(z.any()).optional(), // Airtable attachments
+  user_images: z.array(z.any()).optional(), // Airtable attachments
   ysws_pr_url: z.string().optional(),
   assigned_printer_id: z.string().optional(),
   status: JobStatus.optional(),
   item_name: z.string().optional(),
   item_description: z.string().optional(),
   last_modified: z.string().optional(),
+
+  main_image_id: z.string().optional(),
+  main_stl_id: z.string().optional(),
 });
 
 // Printer table schema

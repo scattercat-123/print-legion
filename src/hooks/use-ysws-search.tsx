@@ -32,16 +32,21 @@ type YSWSContextType = {
   ref: RefObject<MultipleSelectorRef | null>;
   selectedLength: number;
   setSelectedLength: Dispatch<SetStateAction<number>>;
+  onChangeExtra?: (selected: Option[]) => void;
 };
 
 const YSWSContext = createContext<YSWSContextType | null>(null);
 
 export function YSWS_SelectorProvider({
   children,
-  settingsData,
+  getInitialValue,
+  onChangeExtra,
 }: {
   children: React.ReactNode;
-  settingsData: User;
+  getInitialValue?: (
+    yswsData: (YSWSIndex & { id: string }[]) | undefined
+  ) => Option[];
+  onChangeExtra?: (selected: Option[]) => void;
 }) {
   const {
     data: yswsData,
@@ -74,16 +79,8 @@ export function YSWS_SelectorProvider({
   );
 
   const fixedSelectedOptions = useMemo(() => {
-    return (
-      (settingsData.preferred_ysws ?? [])
-        .map((ysws_id) => yswsData?.find((ysws) => ysws.id === ysws_id))
-        .filter(Boolean) as (YSWSIndex & { id: string })[]
-    ).map((ysws) => ({
-      value: ysws.id,
-      label: ysws.name ?? "",
-      img_url: ysws.logo?.[0]?.url ?? "",
-    }));
-  }, [settingsData.preferred_ysws, yswsData]);
+    return getInitialValue?.(yswsData) ?? [];
+  }, [getInitialValue, yswsData]);
 
   const ref = useRef<MultipleSelectorRef>(null);
   const [selectedLength, setSelectedLength] = useState(-1);
@@ -104,6 +101,7 @@ export function YSWS_SelectorProvider({
     ref,
     selectedLength,
     setSelectedLength,
+    onChangeExtra,
   };
 
   return <YSWSContext.Provider value={value}>{children}</YSWSContext.Provider>;
@@ -117,7 +115,11 @@ export function useYSWSSelector() {
   return context;
 }
 
-export default function YSWS_Selector() {
+export default function YSWS_Selector({
+  maxSelected,
+}: {
+  maxSelected?: number;
+}) {
   const {
     serverYSWSOptions,
     isLoading,
@@ -125,6 +127,7 @@ export default function YSWS_Selector() {
     fixedSelectedOptions,
     ref,
     setSelectedLength,
+    onChangeExtra,
   } = useYSWSSelector();
 
   return (
@@ -132,12 +135,14 @@ export default function YSWS_Selector() {
       ref={ref}
       onChange={(selected) => {
         setSelectedLength(selected.length);
+        onChangeExtra?.(selected);
       }}
       placeholder="Nothing here yet..."
       value={fixedSelectedOptions}
       hidePlaceholderWhenSelected={true}
       onSearchSync={fuzzySearch}
       options={serverYSWSOptions}
+      maxSelected={maxSelected}
       className="w-full"
     />
   );

@@ -63,7 +63,7 @@ export default function DashboardPage({
             className="block group transition-transform"
           >
             <div className="rounded-lg shadow-sm border border-border hover:bg-card transition-colors px-5 py-4 flex items-center space-x-4">
-              <div className={`${action.color} p-2 rounded-lg text-white`}>
+              <div className={`${action.color} p-2 rounded-md text-white`}>
                 {action.icon}
               </div>
               <span className="font-medium text-foreground group-hover:text-card-foreground transition-colors">

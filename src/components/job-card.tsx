@@ -40,11 +40,11 @@ function JobCardComponent({
   return (
     <div
       className={cn(
-        "p-4 bg-card border border-border hover:border-zinc-700 transition-all flex gap-2",
+        "p-4 bg-card border border-border hover:border-zinc-700 transition-all flex gap-2 rounded-xl",
         className
       )}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium">{job.item_name || "Untitled Job"}</h3>
@@ -101,7 +101,7 @@ function JobCardComponent({
         <img
           src={`https://picsum.photos/400/400?random=${job.id}`}
           alt="Job"
-          className="size-[7.375rem] object-contain shrink"
+          className="size-[7.375rem] object-contain shrink rounded-md"
         />
       </div>
     </div>

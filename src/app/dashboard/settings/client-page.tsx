@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { updateUserSettings } from "@/app/actions";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { User } from "@/lib/types";
+import type { User, YSWSIndex } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import YSWS_Selector, {
@@ -16,7 +16,19 @@ import YSWS_Selector, {
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (
-    <YSWS_SelectorProvider settingsData={settingsData}>
+    <YSWS_SelectorProvider
+      getInitialValue={(yswsData) => {
+        return (
+          (settingsData.preferred_ysws ?? [])
+            .map((ysws_id) => yswsData?.find((ysws) => ysws.id === ysws_id))
+            .filter(Boolean) as (YSWSIndex & { id: string })[]
+        ).map((ysws) => ({
+          value: ysws.id,
+          label: ysws.name ?? "",
+          img_url: ysws.logo?.[0]?.url ?? "",
+        }));
+      }}
+    >
       <PureSettingsPage settingsData={settingsData} />
     </YSWS_SelectorProvider>
   );
