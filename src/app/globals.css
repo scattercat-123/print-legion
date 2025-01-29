@@ -74,3 +74,115 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Terminal styles */
+.terminal-content {
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.5;
+  padding: 1rem;
+}
+
+.terminal-output {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Terminal input styling */
+.terminal-input-wrapper {
+  position: relative;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-input {
+  caret-color: transparent !important;
+  font-family: "Courier New", Courier, monospace !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 1.5rem !important;
+  background: transparent !important;
+  border: none !important;
+  color: rgb(34, 197, 94) !important;
+}
+
+/* Block cursor */
+.terminal-input-wrapper::after {
+  content: "█";
+  position: absolute;
+  left: calc(1.5rem + var(--cursor-position, 0ch) - 1ch);
+  color: rgb(34, 197, 94);
+  animation: blink 1s step-end infinite;
+  pointer-events: none;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.terminal-input-wrapper:has(input:focus)::after {
+  display: block;
+}
+
+.terminal-input-wrapper:has(input:not(:focus))::after {
+  display: none;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Remove focus ring and default styling */
+.terminal-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  ring: 0 !important;
+}
+
+/* Make the dialog draggable area look more like a terminal title bar */
+.cursor-move {
+  -webkit-app-region: drag;
+  user-select: none;
+  cursor: move;
+}
+
+/* Terminal window shadow */
+.shadow-terminal {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Terminal scrollbar */
+.terminal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.3);
+  border-radius: 4px;
+}
+
+.terminal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.5);
+}
+
+/* Update cursor position based on input length */
+.terminal-input-wrapper {
+  --cursor-position: 0ch;
+}
+
+.terminal-input:not(:empty) {
+  --cursor-position: var(--input-length, 1ch);
+}
