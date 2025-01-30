@@ -79,7 +79,7 @@ body {
 .terminal-content {
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Geist Mono", monospace;
   line-height: 1.5;
   padding: 1rem;
 }
@@ -100,7 +100,7 @@ body {
 
 .terminal-input {
   caret-color: transparent !important;
-  font-family: "Courier New", Courier, monospace !important;
+  font-family: "Geist Mono", monospace !important;
   padding: 0 !important;
   margin: 0 !important;
   height: 1.5rem !important;
@@ -117,7 +117,7 @@ body {
   color: rgb(34, 197, 94);
   animation: blink 1s step-end infinite;
   pointer-events: none;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Geist Mono", monospace;
 }
 
 .terminal-input-wrapper:has(input:focus)::after {
@@ -146,13 +146,6 @@ body {
   box-shadow: none !important;
   border: none !important;
   ring: 0 !important;
-}
-
-/* Make the dialog draggable area look more like a terminal title bar */
-.cursor-move {
-  -webkit-app-region: drag;
-  user-select: none;
-  cursor: move;
 }
 
 /* Terminal window shadow */

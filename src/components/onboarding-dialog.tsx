@@ -297,8 +297,8 @@ export function OnboardingDialog({
       formData.append("onboarded", "on");
       formData.append("has_printer", data.current.user_type === "printer" ? "on" : "off");
       if (data.current.printer_brand) {
-        formData.append("printer_brand", data.current.printer_brand);
-        formData.append("build_volume", data.current.build_volume || "");
+        formData.append("printer_type", data.current.printer_brand);
+        formData.append("printer_details", `Build Volume: ${data.current.build_volume}`);
       }
       await updateUserSettings(formData);
       setLoading(false);
@@ -377,25 +377,15 @@ export function OnboardingDialog({
   return (
     <Dialog open={open} onOpenChange={() => { }}>
       <DialogContent
-        ref={dialogRef}
-        className="font-mono bg-black/95 border border-green-500/20 rounded-lg overflow-hidden shadow-2xl"
+        className="font-mono bg-black/95 border border-green-500/20 rounded-lg overflow-hidden shadow-2xl fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
         style={{
           maxWidth: "min(95vw, 600px)",
           minHeight: "400px",
           maxHeight: "min(95vh, 600px)",
-          position: "fixed",
-          transform: "none",
-          left: "50%",
-          top: "50%",
-          marginLeft: "-300px",
-          marginTop: "-200px"
         }}
         hasCloseButton={false}
       >
-        <div
-          className="bg-black/90 p-2 cursor-move flex items-center justify-between border-b border-green-500/20"
-          onMouseDown={handleMouseDown}
-        >
+        <div className="bg-black/90 p-2 flex items-center justify-between border-b border-green-500/20">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500" />
             <div className="w-3 h-3 rounded-full bg-yellow-500" />
