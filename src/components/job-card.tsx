@@ -1,5 +1,5 @@
 "use client";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import type { Job } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -37,14 +37,26 @@ function JobCardComponent({
     }
   };
 
+  const thumbnailUrl = useMemo(() => {
+    if (!job?.user_images || job.user_images.length < 1) {
+      return undefined;
+    }
+
+    const main_image_id = job.main_image_id;
+    const main_image =
+      job.user_images.find((image) => image.id === main_image_id) ??
+      job.user_images[0];
+    return main_image?.thumbnails?.large?.url ?? main_image?.url;
+  }, [job.main_image_id, job.stls, job.user_images]);
+
   return (
     <div
       className={cn(
-        "p-4 bg-card border border-border hover:border-zinc-700 transition-all flex gap-2",
+        "p-4 bg-card border border-border hover:border-zinc-700 transition-all flex gap-2 rounded-xl",
         className
       )}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium">{job.item_name || "Untitled Job"}</h3>
@@ -97,13 +109,16 @@ function JobCardComponent({
           )}
         </div>
       </div>
-      <div className="w-full max-w-[7.375rem] hidden md:flex">
-        <img
-          src={`https://picsum.photos/400/400?random=${job.id}`}
-          alt="Job"
-          className="size-[7.375rem] object-contain shrink"
-        />
-      </div>
+      {thumbnailUrl && (
+        <div className="w-full max-w-[7.375rem] hidden md:flex">
+          <img
+            // src={`https://picsum.photos/400/400?random=${job.id}`}
+            src={thumbnailUrl}
+            alt="Job"
+            className="size-[7.375rem] object-contain shrink rounded-md border-dashed border border-border"
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,79 +1,50 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { updateUserSettings } from "@/app/actions";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  MultipleSelector,
-  type MultipleSelectorRef,
-  type Option,
-} from "@/components/ui/multiple-selector";
 import type { User, YSWSIndex } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import useSWRImmutable from "swr/immutable";
-import { getAll_YSWS } from "@/lib/airtable/ysws_index";
-import createFuzzySearch from "@nozbe/microfuzz";
 import { toast } from "sonner";
+import YSWS_Selector, {
+  useYSWSSelector,
+  YSWS_SelectorProvider,
+} from "@/hooks/use-ysws-search";
+
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
-  const {
-    data: yswsData,
-    error,
-    isLoading,
-  } = useSWRImmutable("/api/ysws/all", async () => (await getAll_YSWS()) ?? []);
-
-  const filteredYSWS = useMemo(() => {
-    const data = (yswsData?.map((ysws) => ({
-      ...ysws,
-      value: ysws.id,
-      label: ysws.name ?? "",
-      img_url: ysws.logo?.[0]?.url ?? "",
-    })) ?? []) as unknown as Option[];
-    return data;
-  }, [yswsData]);
-
-  const fuzzySearch = useCallback(
-    (query: string) => {
-      const fuzzySearch = createFuzzySearch(filteredYSWS, {
-        getText: (item: YSWSIndex) =>
-          [item.name, item.description, item.homepage_url].filter(
-            Boolean
-          ) as string[],
-      });
-
-      return fuzzySearch(query).map((result) => result.item);
-    },
-    [filteredYSWS]
+  return (
+    <YSWS_SelectorProvider
+      getInitialValue={(yswsData) => {
+        return (
+          (settingsData.preferred_ysws ?? [])
+            .map((ysws_id) => yswsData?.find((ysws) => ysws.id === ysws_id))
+            .filter(Boolean) as (YSWSIndex & { id: string })[]
+        ).map((ysws) => ({
+          value: ysws.id,
+          label: ysws.name ?? "",
+          img_url: ysws.logo?.[0]?.url ?? "",
+        }));
+      }}
+    >
+      <PureSettingsPage settingsData={settingsData} />
+    </YSWS_SelectorProvider>
   );
+}
 
+function PureSettingsPage({ settingsData }: { settingsData: User }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasPrinter, setHasPrinter] = useState(
     settingsData.printer_has ?? false
   );
-  const yswsSelectorRef = useRef<MultipleSelectorRef>(null);
-
-  // Convert preferred_ysws array to MultipleSelector options format
-  const selectedYSWS = useMemo(() => {
-    return (
-      (settingsData.preferred_ysws ?? [])
-        .map((ysws_id) => yswsData?.find((ysws) => ysws.id === ysws_id))
-        .filter(Boolean) as (YSWSIndex & { id: string })[]
-    ).map((ysws) => ({
-      value: ysws.id,
-      label: ysws.name ?? "",
-      img_url: ysws.logo?.[0]?.url ?? "",
-    }));
-  }, [settingsData.preferred_ysws, yswsData]);
-
-  const [selectedLength, setSelectedLength] = useState(-1);
-  useEffect(() => {
-    if (!isLoading) {
-      setSelectedLength(selectedYSWS.length);
-    }
-  }, [selectedYSWS, isLoading]);
+  const {
+    selectedLength,
+    ref: yswsSelectorRef,
+    serverYSWSOptions,
+  } = useYSWSSelector();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -132,29 +103,12 @@ export default function SettingsPage({ settingsData }: { settingsData: User }) {
                 >
                   Preferred YSWS
                 </label>
-                {isLoading ? (
-                  <div className="w-full h-10 border border-border bg-zinc-100/10 animate-pulse rounded-md flex items-center pl-3">
-                    <span className="text-sm text-zinc-400">Loading...</span>
-                  </div>
-                ) : (
-                  <MultipleSelector
-                    ref={yswsSelectorRef}
-                    onChange={(selected) => {
-                      setSelectedLength(selected.length);
-                    }}
-                    placeholder="Nothing here yet..."
-                    value={selectedYSWS}
-                    hidePlaceholderWhenSelected={true}
-                    onSearchSync={fuzzySearch}
-                    options={filteredYSWS}
-                    className="w-full"
-                  />
-                )}
+                <YSWS_Selector />
                 <p className="mt-1 text-xs text-zinc-400">
                   Pick the you-ship-we-ships you'd like to see more of. You
                   still see prints from all of them, but these will be
                   prioritized in search.{" "}
-                  {selectedLength === filteredYSWS.length && (
+                  {selectedLength === serverYSWSOptions.length && (
                     <span className="text-red-500">
                       (Well done! Selecting them all is like... selecting none.)
                     </span>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { getById } from "@/lib/airtable";
+import { getById, updateBySlackId } from "@/lib/airtable";
 
 export async function POST(
   request: Request,
@@ -21,20 +21,26 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    // Get the file from the request
+    // Get the file and metadata from the request
     const formData = await request.formData();
-    console.log(formData.get("file"));
     const file = formData.get("file") as File;
+    const isMain = formData.get("isMain") === "true";
+    const fileType = formData.get("fileType") as "stl" | "image";
+
     if (!file) {
       return new NextResponse("No file provided", { status: 400 });
+    }
+    if (!fileType || !["stl", "image"].includes(fileType)) {
+      return new NextResponse("Invalid file type", { status: 400 });
     }
 
     // Convert file to buffer for Airtable upload
     const buffer = await file.arrayBuffer();
 
     // Upload to Airtable
+    const uploadEndpoint = fileType === "stl" ? "stls" : "user_images";
     const response = await fetch(
-      `https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/stls/uploadAttachment`,
+      `https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/${uploadEndpoint}/uploadAttachment`,
       {
         method: "POST",
         headers: {
@@ -54,7 +60,18 @@ export async function POST(
       return new NextResponse("Failed to upload file", { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    const uploadResult = await response.json();
+    const attachmentId = uploadResult.id;
+
+    // If this is the main file, update the job record
+    if (isMain) {
+      const updateField = fileType === "stl" ? "main_stl_id" : "main_image_id";
+      await updateBySlackId("job", job.id, {
+        [updateField]: attachmentId,
+      });
+    }
+
+    return NextResponse.json({ success: true, attachmentId });
   } catch (error) {
     console.error("Error handling file upload:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

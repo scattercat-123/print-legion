@@ -124,11 +124,25 @@ export async function createJob(formData: FormData) {
 
   // Extract form data
   const ysws = JSON.parse(formData.get("ysws")?.toString() || "[]");
-  const ysws_pr_url = formData.get("ysws_pr_url")?.toString();
+  const ysws_pr_url = formData.get("pr_url")?.toString();
   const part_count = Number.parseInt(
     formData.get("part_count")?.toString() || "0",
     10
   );
+  const item_name = formData.get("item_name")?.toString();
+  const item_description = formData.get("item_description")?.toString();
+
+  if (!item_name || !item_description) {
+    throw new Error("Item name and description are required");
+  }
+
+  if (part_count <= 0) {
+    throw new Error("Part count must be greater than 0");
+  }
+
+  if (ysws.length === 0) {
+    throw new Error("You must select a YSWS");
+  }
 
   // Create the initial job record without files
   const result = await createBySlackId("job", {
@@ -138,6 +152,8 @@ export async function createJob(formData: FormData) {
     ysws,
     ysws_pr_url,
     part_count,
+    item_name,
+    item_description,
   });
 
   if (!result.success || !result.id) {
