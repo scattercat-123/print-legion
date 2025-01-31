@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Slack from "next-auth/providers/slack";
 import Credentials from "next-auth/providers/credentials";
+import { getSlackUserInfo } from "./slack";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Slack({
@@ -16,42 +17,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     ...(process.env.NODE_ENV === "development"
       ? [
-          Credentials({
-            name: "Credentials",
-            credentials: {
-              impersonateId: { label: "Slack ID", type: "text" },
-            },
-            async authorize(credentials, request) {
-              console.log({ credentials });
-              const id = credentials.impersonateId;
-              if (!id) return null;
+        Credentials({
+          name: "Credentials",
+          credentials: {
+            impersonateId: { label: "Slack ID", type: "text" },
+          },
+          async authorize(credentials, request) {
+            const id = credentials.impersonateId;
+            if (!id) return null;
 
-              const data = await fetch(
-                `https://slack.com/api/users.info?user=${id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
-                  },
-                }
-              );
-              const json = await data.json();
-              console.log({ json });
-              if (!json.ok) return null;
-              return {
-                id: id as string,
-                team_id: json.team_id,
-                impersonateId: id as string,
-                name: json.user.real_name,
-                image: json.user.profile.image_original,
-              };
-            },
-          }),
-        ]
+            const user = await getSlackUserInfo(id as string);
+            if (!user) return null;
+            return {
+              id: user.id,
+              team_id: user.team_id,
+              impersonateId: user.id,
+              name: user.real_name,
+              image: user.profile.image_original,
+            };
+          },
+        }),
+      ]
       : []),
   ],
   callbacks: {
     async jwt({ token, profile, session }) {
-      console.log("jwt", { token, profile, session });
 
       if (profile) {
         token.id = profile["https://slack.com/user_id"];
@@ -59,8 +49,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.sub = profile["https://slack.com/user_id"] as string;
       }
 
-      if (token.impersonateId) {
-        token.id = token.impersonateId;
+      if (token.impersonateId ?? token.sub) {
+        token.id = token.impersonateId ?? token.sub;
         token.impersonateId = null;
       }
       return token;

@@ -57,6 +57,9 @@ export const JobSchema = z.object({
   // Filament usage tracking
   filament_used: z.number().optional(),
   printing_notes: z.string().optional(),
+
+  fulfilment_photo: z.array(AirtableAttachmentSchema).optional(),
+  gcode_files: z.array(AirtableAttachmentSchema).optional(),
 });
 
 // Printer table schema

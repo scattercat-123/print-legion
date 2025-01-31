@@ -6,53 +6,15 @@ import { notFound, redirect } from "next/navigation";
 import type { User } from "@/lib/types";
 import Link from "next/link";
 import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRightIcon,
-  CheckIcon,
-  DownloadIcon,
-  FileIcon,
-  GithubIcon,
-  ImageIcon,
-  Loader2Icon,
-  PencilIcon,
-  PrinterIcon,
-  XIcon,
+  ArrowUpRightIcon, DownloadIcon, FileIcon,
+  GithubIcon, PencilIcon
 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Carousel,
-  CarouselButton,
-  CarouselContent,
-  CarouselDots,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  useCarousel,
-} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { ImageCarousel } from "./client-components";
+import { ImageCarousel, PrinterDetails } from "./client-components";
 import { JobStateButtons } from "./states/job-state-buttons";
 import { STATUS_AESTHETIC } from "@/lib/consts";
+import { cached_getById } from "../../layout";
+import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
 
 export default async function JobPage({
   params,
@@ -66,10 +28,12 @@ export default async function JobPage({
 
   const jobId = (await params).jobId;
   const [user, job] = await Promise.all([
-    getById("user", session.user.id) as Promise<User>,
-    getById("job", jobId),
+    cached_getById("user", session.user.id) as Promise<User>,
+    cached_getById("job", jobId),
   ]);
-
+  const printerSlackInfoPromise = job?.assigned_printer_id ? getSlackUserInfo(job.assigned_printer_id) : new Promise(r => r(null));
+  const printerUserPromise = job?.assigned_printer_id ? cached_getById("user", job.assigned_printer_id) : new Promise(r => r(null));
+  const printerDataPromise = Promise.all([printerSlackInfoPromise, printerUserPromise]) as Promise<[SlackUserInfo | null, User | null]>;
   if (!user || !job) {
     notFound();
   }
@@ -173,11 +137,15 @@ export default async function JobPage({
                     {Math.round(stl.size / 1024)}KB
                   </p>
                 </div>
-                <ArrowUpRightIcon className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <DownloadIcon className="size-4 text-muted-foreground group-hover:text-primary transition-opacity" />
               </a>
             ))}
           </div>
         </div>
+      )}
+
+      {job.assigned_printer_id && job.assigned_printer_id !== session.user.id && (
+        <PrinterDetails promise={printerDataPromise} />
       )}
 
       {/* Action Buttons */}

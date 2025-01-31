@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const session = await auth();
 
-  console.log("middleware", { session });
+  // console.log("middleware", { session });
 
   // If the user is not logged in and trying to access protected routes
   if (!session?.user?.id) {

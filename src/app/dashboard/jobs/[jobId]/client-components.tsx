@@ -8,9 +8,20 @@ import {
   CarouselDots,
   CarouselButton,
 } from "@/components/ui/carousel";
-import { AirtableAttachmentSchema } from "@/lib/types";
-import { DownloadIcon } from "lucide-react";
+import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
+import { AirtableAttachmentSchema, User } from "@/lib/types";
+import {
+  DownloadIcon,
+  MessageCircle,
+  Printer,
+  MapPin,
+  Info,
+} from "lucide-react";
+import { use } from "react";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
 export const ImageCarousel = ({
   user_images,
   main_image_id,
@@ -83,5 +94,92 @@ export const ImageCarousel = ({
         </div>
       </div>
     )
+  );
+};
+
+export const PrinterDetails = ({
+  promise,
+}: {
+  promise: Promise<[SlackUserInfo | null, User | null] | null>;
+}) => {
+  const data = use(promise);
+  const slackUser = data?.[0];
+  const user = data?.[1];
+
+  if (!slackUser || !user) return null;
+
+  const openSlackChat = () => {
+    window.open(
+      `https://hackclub.slack.com/archives/${slackUser.id}`,
+      "_blank"
+    );
+  };
+
+  return (
+    <div className="flex flex-col">
+      <h2 className="text-lg font-medium tracking-tight mb-2">Assigned printer</h2>
+      <Card className="w-full">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-grow space-y-4">
+
+            <div className="flex items-center gap-4">
+              <div className="shrink-0">
+                <img
+                  src={slackUser.profile.image_192}
+                  alt={slackUser.real_name}
+                  className="size-12 shrink-0 rounded-xl border border-border"
+                />
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-lg font-medium tracking-tight flex items-center gap-2">
+                  {slackUser.real_name}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  @{slackUser.name}
+                </p>
+              </div>
+            </div>
+
+            {user.printer_has && (
+              <div className="space-y-2">
+                {(user.printer_details || user.printer_type) && (
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Printer className="h-4 w-4" />
+                      Printer details
+                    </div>
+
+                    <span className="text-sm text-muted-foreground">
+                      {user.printer_type ?? "Printer type not specified"}
+                    </span>
+                    {user.printer_details && (
+                      <span className="text-sm text-muted-foreground">
+                        {user.printer_details}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {user.region_coordinates && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>Region available</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Button
+              onClick={openSlackChat}
+              className="w-full sm:w-auto"
+              variant="secondary"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Chat on Slack
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card></div>
   );
 };
