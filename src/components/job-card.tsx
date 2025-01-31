@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
 import { ArrowUpRightIcon, Github } from "lucide-react";
+import { STATUS_AESTHETIC } from "@/lib/consts";
 
 interface JobCardProps {
   job: Job & { id: string };
@@ -19,23 +20,6 @@ function JobCardComponent({
   className,
 }: JobCardProps) {
   const router = useRouter();
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-500";
-      case "claimed":
-        return "bg-blue-500/20 text-blue-500";
-      case "in_progress":
-        return "bg-purple-500/20 text-purple-500";
-      case "completed":
-        return "bg-green-500/20 text-green-500";
-      case "cancelled":
-        return "bg-red-500/20 text-red-500";
-      default:
-        return "bg-zinc-500/20 text-zinc-500";
-    }
-  };
 
   const thumbnailUrl = useMemo(() => {
     if (!job?.user_images || job.user_images.length < 1) {
@@ -73,15 +57,12 @@ function JobCardComponent({
                 </Badge>
               )}
 
-              {job.status && (
+              {job.status && job.status !== "needs_printer" && (
                 <Badge
                   variant="external-color"
-                  className={cn("text-xs", getStatusColor(job.status))}
+                  className={cn("text-xs", STATUS_AESTHETIC[job.status].color)}
                 >
-                  {job.status
-                    .split("_")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                  {STATUS_AESTHETIC[job.status].text}
                 </Badge>
               )}
             </div>
