@@ -5,6 +5,7 @@ import Airtable from "airtable";
 import { createRecord, getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import type { User, JobStatusType } from "@/lib/types";
+import { geocodeSearch, type GeocodingResult } from "@/lib/geo";
 
 // Initialize Airtable base
 const airtable = new Airtable({
@@ -175,6 +176,7 @@ export async function updateUserSettings(formData: FormData) {
   const printer_details = formData.get("printer_details")?.toString();
   const has_printer = formData.get("has_printer")?.toString();
   const region_coordinates = formData.get("region_coordinates")?.toString();
+  const region_complete_name = formData.get("region_complete_name")?.toString();
   const user = await getById("user", session.user.id);
   const onboarded = formData.get("onboarded")
     ? formData.get("onboarded") === "on"
@@ -190,6 +192,7 @@ export async function updateUserSettings(formData: FormData) {
     printer_details,
     onboarded,
     region_coordinates,
+    region_complete_name,
   };
 
   if (!user) {
@@ -209,4 +212,25 @@ export async function updateUserSettings(formData: FormData) {
   }
 
   throw new Error("Failed to update settings");
+}
+
+export async function searchLocations(query: string) {
+  const results = await geocodeSearch(query);
+  let seen: Set<string> = new Set();
+  let seen_coords: Set<string> = new Set();
+  return results.reduce((acc, result) => {
+    if (seen.has(result.display_name)) {
+      return acc;
+    }
+    if (seen_coords.has(`${result.lat},${result.lon}`)) {
+      return acc;
+    }
+    seen.add(result.display_name);
+    seen_coords.add(`${result.lat},${result.lon}`);
+    acc.push({
+      value: `${result.lat},${result.lon}`,
+      label: result.display_name,
+    });
+    return acc;
+  }, [] as { value: string; label: string }[]);
 }

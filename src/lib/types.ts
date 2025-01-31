@@ -41,9 +41,7 @@ export const AirtableAttachmentSchema = z.object({
 export const JobSchema = z.object({
   creator: AirtableReferenceSchema, // e.g., ["rect0PI1RBEOvQee0"]
   "(auto)(creator)slack_id": z.array(z.string()).optional(),
-  "(auto)(creator)region_coordinates": z
-    .array(z.string().regex(/^-?\d{1,2}\.\d{1,8},-?\d{1,2}\.\d{1,8}$/))
-    .optional(),
+  "(auto)(creator)region_coordinates": z.array(z.string()).optional(),
 
   ysws: AirtableReferenceSchema, // e.g., ["rect0PI1RBEOvQee0"]
   "(auto)(ysws)name": z.array(z.string()).optional(), // e.g., ["Hackpad"]
@@ -82,10 +80,8 @@ export const UserSchema = z.object({
   onboarded: z.boolean().default(false).optional(),
   has_ever_submitted: z.boolean().default(false).optional(),
   // lat,lon e.g "40.7128,-74.0060"
-  region_coordinates: z
-    .string()
-    .regex(/^-?\d{1,2}\.\d{1,8},-?\d{1,2}\.\d{1,8}$/)
-    .optional(),
+  region_coordinates: z.string().optional(),
+  region_complete_name: z.string().optional(),
 });
 
 export const YSWSIndexSchema = z.object({

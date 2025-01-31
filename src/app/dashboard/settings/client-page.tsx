@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { updateUserSettings } from "@/app/actions";
+import { updateUserSettings, searchLocations } from "@/app/actions";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { User, YSWSIndex } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,8 @@ import YSWS_Selector, {
   useYSWSSelector,
   YSWS_SelectorProvider,
 } from "@/hooks/use-ysws-search";
+import { AutoComplete } from "@/components/ui/autocomplete";
+import { useMemo, useState as useStateForLocation } from "react";
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (
@@ -40,11 +42,49 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
   const [hasPrinter, setHasPrinter] = useState(
     settingsData.printer_has ?? false
   );
+  const [locationOptions, setLocationOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<
+    { value: string; label: string } | undefined
+  >(
+    settingsData.region_coordinates
+      ? {
+          value: settingsData.region_coordinates,
+          label: settingsData.region_complete_name || "",
+        }
+      : undefined
+  );
   const {
     selectedLength,
     ref: yswsSelectorRef,
     serverYSWSOptions,
   } = useYSWSSelector();
+
+  const debouncedSearchLocation = useMemo(() => {
+    let timeoutId: NodeJS.Timeout;
+    return async (query: string) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!query.trim()) {
+        setLocationOptions([]);
+        return;
+      }
+
+      timeoutId = setTimeout(async () => {
+        setIsLoadingLocation(true);
+        try {
+          const results = await searchLocations(query);
+          setLocationOptions(results);
+        } catch (error) {
+          console.error("Failed to search locations:", error);
+          toast.error("Error searching locations");
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      }, 300);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,12 +92,18 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
 
     try {
       const formData = new FormData(e.currentTarget);
+      console.log(Object.fromEntries(formData.entries()));
       // Get selected YSWS from the ref
       const selectedOptions = yswsSelectorRef.current?.selectedValue ?? [];
       formData.set(
         "preferred_ysws",
         JSON.stringify(selectedOptions.map((opt) => opt.value))
       );
+      if (selectedLocation) {
+        formData.set("region_coordinates", selectedLocation.value);
+        formData.set("region_complete_name", selectedLocation.label);
+      }
+
       await updateUserSettings(formData);
       toast.success("Settings saved", {
         description: "Your printer settings have been updated successfully.",
@@ -82,6 +128,32 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
 
       <form onSubmit={handleSubmit} className="space-y-6 mt-4">
         <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="region_complete_name"
+              className="block text-sm font-medium mb-2"
+            >
+              Your Location
+            </label>
+            <AutoComplete
+              options={locationOptions}
+              emptyMessage="No locations found"
+              value={selectedLocation}
+              onValueChange={(value) => {
+                setSelectedLocation(value);
+              }}
+              isLoading={isLoadingLocation}
+              disabled={isSubmitting}
+              placeholder="Search for your location..."
+              onInputChange={debouncedSearchLocation}
+            />
+            <p className="mt-1 text-xs text-zinc-400">
+              Enter your location to help us match you with nearby prints.
+              Please <b>do not add your exact address</b>, but rather a general
+              area.
+            </p>
+          </div>
+
           <div className="flex items-center space-x-2">
             <Checkbox
               id="has_printer"
