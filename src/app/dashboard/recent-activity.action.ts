@@ -31,20 +31,20 @@ export async function getRecentActivity(): Promise<
     const [records, activeJobs, completedJobs] = await Promise.all([
       jobsTable
         .select({
-          filterByFormula: `AND(IS_AFTER({last_modified}, '${formattedDate}'),OR({assigned_printer_id} = '${session.user.id}',{slack_id} = '${session.user.id}'))`,
+          filterByFormula: `AND(IS_AFTER({last_modified}, '${formattedDate}'),OR({(auto)(assigned_printer)slack_id} = '${session.user.id}',{(auto)(creator)slack_id} = '${session.user.id}'))`,
           sort: [{ field: "last_modified", direction: "desc" }],
           maxRecords: 5,
         })
         .all(),
       jobsTable
         .select({
-          filterByFormula: `AND({status} = 'in_progress',{assigned_printer_id} = '${session.user.id}')`,
+          filterByFormula: `AND({status} = 'in_progress',{(auto)(assigned_printer)slack_id} = '${session.user.id}')`,
           maxRecords: 0,
         })
         .all(),
       jobsTable
         .select({
-          filterByFormula: `AND({status} = 'done',{assigned_printer_id} = '${session.user.id}')`,
+          filterByFormula: `AND({status} = 'done',{(auto)(assigned_printer)slack_id} = '${session.user.id}')`,
           maxRecords: 0,
         })
         .all(),

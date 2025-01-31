@@ -6,8 +6,11 @@ import { notFound, redirect } from "next/navigation";
 import type { User } from "@/lib/types";
 import Link from "next/link";
 import {
-  ArrowUpRightIcon, DownloadIcon, FileIcon,
-  GithubIcon, PencilIcon
+  ArrowUpRightIcon,
+  DownloadIcon,
+  FileIcon,
+  GithubIcon,
+  PencilIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageCarousel, PrinterDetails } from "./client-components";
@@ -31,15 +34,25 @@ export default async function JobPage({
     cached_getById("user", session.user.id) as Promise<User>,
     cached_getById("job", jobId),
   ]);
-  const printerSlackInfoPromise = job?.assigned_printer_id ? getSlackUserInfo(job.assigned_printer_id) : new Promise(r => r(null));
-  const printerUserPromise = job?.assigned_printer_id ? cached_getById("user", job.assigned_printer_id) : new Promise(r => r(null));
-  const printerDataPromise = Promise.all([printerSlackInfoPromise, printerUserPromise]) as Promise<[SlackUserInfo | null, User | null]>;
+
+  const assignedPrinterId = job?.["(auto)(assigned_printer)slack_id"]?.[0];
+
+  const printerSlackInfoPromise = assignedPrinterId
+    ? getSlackUserInfo(assignedPrinterId)
+    : new Promise((r) => r(null));
+  const printerUserPromise = assignedPrinterId
+    ? cached_getById("user", assignedPrinterId)
+    : new Promise((r) => r(null));
+  const printerDataPromise = Promise.all([
+    printerSlackInfoPromise,
+    printerUserPromise,
+  ]) as Promise<[SlackUserInfo | null, User | null]>;
   if (!user || !job) {
     notFound();
   }
 
-  const isMyJob = job.slack_id === session.user.id;
-  const isPrinting = job.assigned_printer_id === session.user.id;
+  const isMyJob = job["(auto)(creator)slack_id"]?.[0] === session.user.id;
+  const isPrinting = assignedPrinterId === session.user.id;
   const hasPrinter = user.printer_has ?? false;
 
   return (
@@ -144,7 +157,7 @@ export default async function JobPage({
         </div>
       )}
 
-      {job.assigned_printer_id && job.assigned_printer_id !== session.user.id && (
+      {assignedPrinterId && assignedPrinterId !== session.user.id && (
         <PrinterDetails promise={printerDataPromise} />
       )}
 

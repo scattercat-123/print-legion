@@ -170,7 +170,7 @@ function PureCreateJobPage() {
     }));
   };
 
-  const clearForm = () => {
+  const clearForm = (moveBack = true) => {
     // clear local storage
     localStorage.removeItem("createJobState");
     for (const key of [
@@ -185,10 +185,13 @@ function PureCreateJobPage() {
 
     setFiles({ images: [], stls: [] });
     setMainFiles({ images: -1, stls: -1 });
-    setIsSubmitting(false);
-    setLogs([]);
+
     yswsSelectorRef.current?.reset();
     document.querySelector("form")?.reset();
+    if (moveBack) {
+      setLogs([]);
+      setIsSubmitting(false);
+    }
   };
 
   const validateForm = (formData: FormData): boolean => {
@@ -415,7 +418,7 @@ function PureCreateJobPage() {
 
       addLog("Job created successfully!", "success", "finalizeJob");
 
-      clearForm();
+      clearForm(false);
       finalJobId.current = result.jobId;
     } catch (error) {
       updateLog("error", "createJobRecord");
@@ -705,7 +708,7 @@ function PureCreateJobPage() {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     variant="destructive-outline"
-                    onClick={clearForm}
+                    onClick={() => clearForm(true)}
                   >
                     Continue
                   </AlertDialogAction>

@@ -19,7 +19,7 @@ export async function getById<T extends "job" | "user">(
         .firstPage();
 
       if (records.length === 0 && type === "user") {
-        await createBySlackId("user", { slack_id: id });
+        await createRecord("user", { slack_id: id });
         return { slack_id: id, id: "" } as User & { id: string };
       }
 
@@ -46,13 +46,13 @@ export async function getById<T extends "job" | "user">(
   }
 }
 
-export async function createBySlackId<T extends "job" | "user">(
+export async function createRecord<T extends "job" | "user">(
   type: T,
   data: Partial<T extends "job" ? Job : User>
 ): Promise<{ success: boolean; id?: string }> {
   try {
     const table = type === "job" ? jobsTable : usersTable;
-    const record = await table.create(data);
+    const record = await table.create(data as Partial<FieldSet>);
     return { success: true, id: record.id };
   } catch (error) {
     console.error("Error creating record:", error);
@@ -85,7 +85,7 @@ export async function updateBySlackId<T extends "job" | "user">(
       foundId = id;
     }
 
-    await table.update(foundId, data);
+    await table.update(foundId, data as Partial<FieldSet>);
     return true;
   } catch (error) {
     console.error("Error updating record:", error);

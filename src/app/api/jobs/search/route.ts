@@ -22,7 +22,8 @@ export async function GET(request: Request) {
 
     // Filter to only show jobs that need printing
     const availableJobs = jobs.filter(
-      (job) => !job.assigned_printer_id && job.need_printed_parts
+      (job) =>
+        !job["(auto)(assigned_printer)slack_id"] && job.need_printed_parts
     );
 
     return NextResponse.json(availableJobs);

@@ -10,6 +10,8 @@ export const JobStatus = z.enum([
   "cancelled", // Cancelled by submitter
 ]);
 
+const AirtableReferenceSchema = z.array(z.string()).optional();
+
 const ThumbnailSchema = z
   .object({
     url: z.string().url(),
@@ -37,15 +39,23 @@ export const AirtableAttachmentSchema = z.object({
 
 // User table schema
 export const JobSchema = z.object({
-  slack_id: z.string(),
-  ysws: z.array(z.string()).optional(), // e.g., ["rect0PI1RBEOvQee0"]
-  "(auto)ysws_name": z.array(z.string()).optional(), // e.g., ["Hackpad"]
+  creator: AirtableReferenceSchema, // e.g., ["rect0PI1RBEOvQee0"]
+  "(auto)(creator)slack_id": z.array(z.string()).optional(),
+  "(auto)(creator)region_coordinates": z
+    .array(z.string().regex(/^-?\d{1,2}\.\d{1,8},-?\d{1,2}\.\d{1,8}$/))
+    .optional(),
+
+  ysws: AirtableReferenceSchema, // e.g., ["rect0PI1RBEOvQee0"]
+  "(auto)(ysws)name": z.array(z.string()).optional(), // e.g., ["Hackpad"]
   need_printed_parts: z.boolean().default(true).optional(),
   part_count: z.number().optional(),
   stls: z.array(AirtableAttachmentSchema).optional(), // Airtable attachments
   user_images: z.array(AirtableAttachmentSchema).optional(), // Airtable attachments
   ysws_pr_url: z.string().optional(),
-  assigned_printer_id: z.string().optional(),
+
+  assigned_printer: AirtableReferenceSchema, // e.g., ["rect0PI1RBEOvQee0"]
+  "(auto)(assigned_printer)slack_id": z.array(z.string()).optional(),
+
   status: JobStatus.optional(),
   item_name: z.string().optional(),
   item_description: z.string().optional(),

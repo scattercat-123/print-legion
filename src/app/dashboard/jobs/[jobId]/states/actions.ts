@@ -3,7 +3,6 @@
 import { auth } from "@/lib/auth";
 import { getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import type { FilamentUsage, FulfillmentPhoto } from "./types";
 import type { JobStatusType } from "@/lib/types";
 
@@ -18,7 +17,7 @@ export async function startPrinting(jobId: string) {
     throw new Error("Job not found");
   }
 
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     throw new Error("Not authorized to start this print");
   }
 
@@ -48,7 +47,7 @@ export async function completePrinting(
     throw new Error("Job not found");
   }
 
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     throw new Error("Not authorized to complete this print");
   }
 
@@ -80,7 +79,7 @@ export async function markFulfilled(
     throw new Error("Job not found");
   }
 
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     throw new Error("Not authorized to mark this job as fulfilled");
   }
 
@@ -113,7 +112,7 @@ export async function confirmFulfillment(jobId: string) {
     throw new Error("Job not found");
   }
 
-  if (job.slack_id !== session.user.id) {
+  if (job["(auto)(creator)slack_id"]?.[0] !== session.user.id) {
     throw new Error("Not authorized to confirm this fulfillment");
   }
 
@@ -135,8 +134,13 @@ export async function claimJob(jobId: string) {
     throw new Error("Not authenticated");
   }
 
+  const user = await getById("user", session.user.id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: session.user.id,
+    assigned_printer: [user.id],
     status: "claimed" as JobStatusType,
   });
 
@@ -159,12 +163,12 @@ export async function unclaimJob(jobId: string) {
     throw new Error("Job not found");
   }
 
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     throw new Error("Not authorized to unclaim this job");
   }
 
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: "",
+    assigned_printer: undefined,
     status: "needs_printer" as JobStatusType,
   });
 

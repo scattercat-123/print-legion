@@ -17,7 +17,7 @@ export async function POST(
     if (!job) {
       return new NextResponse("Job not found", { status: 404 });
     }
-    if (job.slack_id !== session.user.id) {
+    if (job["(auto)(creator)slack_id"]?.[0] !== session.user.id) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 

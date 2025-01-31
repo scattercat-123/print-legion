@@ -66,9 +66,11 @@ export const ImageCarousel = ({
                     <p className="absolute bottom-2 left-2 z-20 text-xs text-card-foreground bg-card/60 hover:bg-card transition-colors rounded-full px-1">
                       {image.filename.length < 10
                         ? image.filename
-                        : `${image.filename.split(".")[0].slice(0, 10)}.${
-                            image.filename.split(".")[1]
-                          }`}
+                        : `${image.filename
+                            .split(".")
+                            .slice(0, -1)
+                            .join(".")
+                            .slice(0, 10)}.${image.filename.split(".").pop()}`}
                     </p>
 
                     <button
@@ -110,76 +112,78 @@ export const PrinterDetails = ({
 
   const openSlackChat = () => {
     window.open(
-      `https://hackclub.slack.com/archives/${slackUser.id}`,
+      `https://slack.com/app_redirect?team=T0266FRGM&channel=${slackUser.id}`,
       "_blank"
     );
   };
 
   return (
     <div className="flex flex-col">
-      <h2 className="text-lg font-medium tracking-tight mb-2">Assigned printer</h2>
-      <Card className="w-full">
+      <h2 className="text-lg font-medium tracking-tight mb-2">
+        Assigned printer
+      </h2>
+      <Card className="max-w-md">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
             <div className="flex-grow space-y-4">
-
-            <div className="flex items-center gap-4">
-              <div className="shrink-0">
-                <img
-                  src={slackUser.profile.image_192}
-                  alt={slackUser.real_name}
-                  className="size-12 shrink-0 rounded-xl border border-border"
-                />
+              <div className="flex items-center gap-4">
+                <div className="shrink-0">
+                  <img
+                    src={slackUser.profile.image_192}
+                    alt={slackUser.real_name}
+                    className="size-12 shrink-0 rounded-xl border border-border"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <h2 className="text-lg font-medium tracking-tight flex items-center gap-2">
+                    {slackUser.real_name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    @{slackUser.name}
+                  </p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <h2 className="text-lg font-medium tracking-tight flex items-center gap-2">
-                  {slackUser.real_name}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  @{slackUser.name}
-                </p>
-              </div>
-            </div>
 
-            {user.printer_has && (
-              <div className="space-y-2">
-                {(user.printer_details || user.printer_type) && (
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <Printer className="h-4 w-4" />
-                      Printer details
-                    </div>
+              {user.printer_has && (
+                <div className="space-y-2">
+                  {(user.printer_details || user.printer_type) && (
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Printer className="h-4 w-4" />
+                        Printer details
+                      </div>
 
-                    <span className="text-sm text-muted-foreground">
-                      {user.printer_type ?? "Printer type not specified"}
-                    </span>
-                    {user.printer_details && (
                       <span className="text-sm text-muted-foreground">
-                        {user.printer_details}
+                        {user.printer_type ?? "Printer type not specified"}
                       </span>
-                    )}
-                  </div>
-                )}
-                {user.region_coordinates && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>Region available</span>
-                  </div>
-                )}
-              </div>
-            )}
+                      {user.printer_details && (
+                        <span className="text-sm text-muted-foreground">
+                          {user.printer_details}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {user.region_coordinates && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>Region available</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
-            <Button
-              onClick={openSlackChat}
-              className="w-full sm:w-auto"
-              variant="secondary"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Chat on Slack
-            </Button>
+              <Button
+                onClick={openSlackChat}
+                className="w-full sm:w-auto"
+                variant="secondary"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Chat on Slack
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card></div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

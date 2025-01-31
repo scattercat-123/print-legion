@@ -2,9 +2,9 @@
 
 import { auth } from "@/lib/auth";
 import Airtable from "airtable";
-import { createBySlackId, getById, updateBySlackId } from "@/lib/airtable";
+import { createRecord, getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
-import type { User } from "@/lib/types";
+import type { User, JobStatusType } from "@/lib/types";
 
 // Initialize Airtable base
 const airtable = new Airtable({
@@ -32,14 +32,15 @@ export async function claimJob(jobId: string) {
     throw new Error("Not authenticated");
   }
 
-  const user = await getById("user", session.user.id);
-  if (!user) {
-    throw new Error("User not found");
+  const printer = await getById("user", session.user.id);
+  if (!printer?.id) {
+    throw new Error("Printer not found");
   }
 
   // Update the user record
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: user.slack_id,
+    assigned_printer: [printer.id],
+    status: "claimed" as JobStatusType,
   });
 
   if (success) {
@@ -62,13 +63,14 @@ export async function unclaimJob(jobId: string) {
   }
 
   // Check if user is assigned to this job
-  if (job.assigned_printer_id !== session.user.id) {
+  if (!job["(auto)(assigned_printer)slack_id"]?.includes(session.user.id)) {
     throw new Error("Not assigned to this job");
   }
 
   // Update the user record
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: undefined,
+    assigned_printer: undefined,
+    status: "needs_printer" as JobStatusType,
   });
 
   if (success) {
@@ -79,10 +81,7 @@ export async function unclaimJob(jobId: string) {
   throw new Error("Failed to unclaim job");
 }
 
-export async function updateJobStatus(
-  jobId: string,
-  status: "in_progress" | "done" | "cancelled"
-) {
+export async function updateJobStatus(jobId: string, status: JobStatusType) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Not authenticated");
@@ -94,7 +93,7 @@ export async function updateJobStatus(
   }
 
   // Check if user is assigned to this job
-  if (job.assigned_printer_id !== session.user.id) {
+  if (!job["(auto)(assigned_printer)slack_id"]?.includes(session.user.id)) {
     throw new Error("Not assigned to this job");
   }
 
@@ -117,9 +116,9 @@ export async function createJob(formData: FormData) {
     throw new Error("Not authenticated");
   }
 
-  const user = await getById("user", session.user.id);
-  if (!user) {
-    throw new Error("User not found");
+  const creator = await getById("user", session.user.id);
+  if (!creator?.id) {
+    throw new Error("Creator not found");
   }
 
   // Extract form data
@@ -145,8 +144,8 @@ export async function createJob(formData: FormData) {
   }
 
   // Create the initial job record without files
-  const result = await createBySlackId("job", {
-    slack_id: user.slack_id,
+  const result = await createRecord("job", {
+    creator: [creator.id],
     need_printed_parts: true,
     stls: [], // Start with empty array
     ysws,
@@ -194,7 +193,7 @@ export async function updateUserSettings(formData: FormData) {
   };
 
   if (!user) {
-    const success = await createBySlackId("user", obj);
+    const success = await createRecord("user", obj);
     if (!success) {
       throw new Error("Failed to create user");
     }

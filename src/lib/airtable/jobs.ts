@@ -13,12 +13,18 @@ export async function searchJobs({
   offset?: number;
   maxRecords?: number;
 }) {
+  const _query = query?.toLowerCase().trim();
   try {
     const records = await jobsTable
       .select({
         filterByFormula:
           mode === "search"
-            ? `OR(SEARCH("${query}", LOWER({slack_id})),SEARCH("${query}", LOWER({ysws})), SEARCH("${query}", LOWER({item_name})), SEARCH("${query}", LOWER({item_description})))`
+            ? `OR(
+            SEARCH("${_query}", LOWER({item_name})),
+            SEARCH("${_query}", LOWER({item_description})),
+            SEARCH("${_query}", LOWER({ysws_pr_url})),
+            SEARCH("${_query}", LOWER(ARRAYJOIN({(auto)(creator)slack_id})))
+            )`
             : query,
         offset,
         maxRecords,
