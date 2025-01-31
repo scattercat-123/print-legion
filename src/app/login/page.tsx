@@ -3,6 +3,11 @@ import { signIn } from "@/lib/auth";
 import { FaSlack } from "react-icons/fa";
 import Image from "next/image";
 import cherryMX from "@media/switch.png";
+import { Input } from "@/components/ui/input";
+import { ArrowRightIcon, UserCheck2Icon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { ImpersonateBtn } from "./impersonate-btn";
 
 export default async function LoginPage() {
   return (
@@ -21,7 +26,7 @@ export default async function LoginPage() {
             </p>
           </div>
 
-          <div className="pt-8">
+          <div className="pt-8 flex flex-col gap-2">
             <Button
               variant="outline"
               size="lg"
@@ -34,6 +39,8 @@ export default async function LoginPage() {
               <FaSlack className="mr-2 h-5 w-5" />
               Sign in with Slack
             </Button>
+
+            {process.env.NODE_ENV === "development" && <ImpersonateBtn />}
           </div>
 
           <div className="text-sm text-muted-foreground">

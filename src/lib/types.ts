@@ -1,6 +1,14 @@
 import { z } from "zod";
 
-export const JobStatus = z.enum(["in_progress", "done", "cancelled"]);
+export const JobStatus = z.enum([
+  "needs_printer", // Initial state after submission
+  "claimed", // Printer has claimed but not started
+  "printing_in_progress", // Printing has started
+  "completed_printing", // Printing finished, awaiting fulfillment
+  "fulfilled_awaiting_confirmation", // Fulfillment done, awaiting confirmation from submitter
+  "finished", // All done
+  "cancelled", // Cancelled by submitter
+]);
 
 const ThumbnailSchema = z
   .object({
@@ -45,6 +53,10 @@ export const JobSchema = z.object({
 
   main_image_id: z.string().optional(),
   main_stl_id: z.string().optional(),
+
+  // Filament usage tracking
+  filament_used: z.number().optional(),
+  printing_notes: z.string().optional(),
 });
 
 // Printer table schema

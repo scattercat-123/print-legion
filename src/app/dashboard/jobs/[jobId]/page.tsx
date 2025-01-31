@@ -6,8 +6,11 @@ import { notFound, redirect } from "next/navigation";
 import type { User } from "@/lib/types";
 import Link from "next/link";
 import {
+  ArrowLeft,
+  ArrowRight,
   ArrowUpRightIcon,
   CheckIcon,
+  DownloadIcon,
   FileIcon,
   GithubIcon,
   ImageIcon,
@@ -38,12 +41,18 @@ import {
 } from "@/components/ui/dialog";
 import {
   Carousel,
+  CarouselButton,
   CarouselContent,
+  CarouselDots,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  useCarousel,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { ImageCarousel } from "./client-components";
+import { JobStateButtons } from "./states/job-state-buttons";
+import { STATUS_AESTHETIC } from "@/lib/consts";
 
 export default async function JobPage({
   params,
@@ -69,23 +78,6 @@ export default async function JobPage({
   const isPrinting = job.assigned_printer_id === session.user.id;
   const hasPrinter = user.printer_has ?? false;
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-500";
-      case "claimed":
-        return "bg-blue-500/20 text-blue-500";
-      case "in_progress":
-        return "bg-purple-500/20 text-purple-500";
-      case "completed":
-        return "bg-green-500/20 text-green-500";
-      case "cancelled":
-        return "bg-red-500/20 text-red-500";
-      default:
-        return "bg-zinc-500/20 text-zinc-500";
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header Section */}
@@ -101,12 +93,9 @@ export default async function JobPage({
             {job.status && (
               <Badge
                 variant="external-color"
-                className={cn("text-xs", getStatusColor(job.status))}
+                className={cn("text-xs", STATUS_AESTHETIC[job.status].color)}
               >
-                {job.status
-                  .split("_")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
+                {STATUS_AESTHETIC[job.status].text}
               </Badge>
             )}
           </div>
@@ -127,14 +116,16 @@ export default async function JobPage({
               </Link>
             </Button>
           )}
-          {isMyJob && (
-            <Button variant="outline" size="sm" asChild className="gap-2">
-              <Link href={`/dashboard/jobs/edit/${jobId}`}>
-                <PencilIcon className="size-4" />
-                Edit Details
-              </Link>
-            </Button>
-          )}
+          {isMyJob &&
+            job.status !== "fulfilled_awaiting_confirmation" &&
+            job.status !== "finished" && (
+              <Button variant="outline" size="sm" asChild className="gap-2">
+                <Link href={`/dashboard/jobs/edit/${jobId}`}>
+                  <PencilIcon className="size-4" />
+                  Edit Details
+                </Link>
+              </Button>
+            )}
         </div>
       </div>
 
@@ -148,57 +139,17 @@ export default async function JobPage({
         </div>
       )}
 
-      {/* Images Carousel */}
-      {job.user_images && job.user_images.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium tracking-tight">Images</h2>
-          <div className="relative">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent>
-                {job.user_images.map((image: any) => (
-                  <CarouselItem
-                    key={image.id}
-                    className="basis-full md:basis-1/2 lg:basis-1/3"
-                  >
-                    <div className="relative aspect-square">
-                      <img
-                        src={image.url}
-                        alt={image.filename}
-                        className="absolute inset-0 object-cover w-full h-full rounded-lg border border-border"
-                      />
-                      {image.id === job.main_image_id && (
-                        <Badge
-                          variant="secondary"
-                          className="absolute top-2 right-2"
-                        >
-                          Main Image
-                        </Badge>
-                      )}
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="flex">
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
-              </div>
-            </Carousel>
-          </div>
-        </div>
-      )}
+      <ImageCarousel
+        user_images={job.user_images}
+        main_image_id={job.main_image_id}
+      />
 
       {/* STL Files */}
       {job.stls && job.stls.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-lg font-medium tracking-tight">STL Files</h2>
           <div className="grid gap-2">
-            {job.stls.map((stl: any) => (
+            {job.stls.map((stl) => (
               <a
                 key={stl.id}
                 href={stl.url}
@@ -231,114 +182,13 @@ export default async function JobPage({
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 pt-4">
-        {hasPrinter && !isPrinting && !job.assigned_printer_id && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <PrinterIcon className="size-4" />
-                Claim Job
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Claim this print job?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  By claiming this job, you're committing to print these parts.
-                  Make sure you have the right materials and time available.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction formAction={`/api/jobs/${jobId}/claim`}>
-                  Claim Job
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-
-        {isPrinting && (
-          <>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Loader2Icon className="size-4" />
-                  Start Printing
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Start printing this job?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will mark the job as "In Progress". Make sure you have
-                    all the necessary materials ready.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    formAction={`/api/jobs/${jobId}/status/in_progress`}
-                  >
-                    Start Printing
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <CheckIcon className="size-4" />
-                  Mark Complete
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Mark job as complete?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will mark the job as "Done". Make sure all parts have
-                    been printed successfully.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    formAction={`/api/jobs/${jobId}/status/done`}
-                  >
-                    Mark Complete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <XIcon className="size-4" />
-                  Unclaim Job
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Unclaim this job?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will remove you as the printer for this job. Another
-                    printer will be able to claim it.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    formAction={`/api/jobs/${jobId}/unclaim`}
-                    variant="destructive-outline"
-                  >
-                    Unclaim Job
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        )}
+        <JobStateButtons
+          jobId={jobId}
+          status={job.status || "needs_printer"}
+          isMyJob={isMyJob}
+          isPrinting={isPrinting}
+          hasPrinter={hasPrinter}
+        />
       </div>
     </div>
   );
