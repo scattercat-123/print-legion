@@ -2,7 +2,7 @@
 description: main frontend rules for the app - please take into mind when doing any UI code
 globs: *.tsx
 ---
-- we use nextjs, tailwindcss, shadcn/ui
+- we use nextjs, tailwindcss, shadcn/ui, typescript
 - package manager: bun
 - i always prefer sonner over toast. do not install or use toast or useToast.
 - do not hallucinate or create shadcn primitives or components yourself, ask to run the comand to add the related component e.g `bunx --bun shadcn@latest add popover`

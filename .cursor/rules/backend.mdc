@@ -1,0 +1,7 @@
+---
+description: main backend rules - describing how to do data fetching etc
+globs: 
+---
+- prefer server actions over creating api routes - we are moving away from api routes slowly
+- our main DB is airtable, and our source of truth for user auth is slack, using authjs (aka next auth but newer so v5 where they renamed) as the login system
+- we use swr for data fetching, not react-query
