@@ -12,14 +12,14 @@ export async function claimJob(jobId: string) {
     redirect("/");
   }
 
-  const user = (await getById("user", session.user.id)) as User;
+  const user = await getById("user", session.user.id);
   if (!user) {
     redirect("/");
   }
 
   // Update the job record
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: user.slack_id,
+    assigned_printer: [user.id],
   });
 
   if (success) {
@@ -41,13 +41,13 @@ export async function unclaimJob(jobId: string) {
   }
 
   // Check if user is assigned to this job
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     redirect("/dashboard");
   }
 
   // Update the job record
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer_id: undefined,
+    assigned_printer: undefined,
   });
 
   if (success) {
@@ -69,7 +69,7 @@ export async function updateJobStatus(jobId: string, status: JobStatusType) {
   }
 
   // Check if user is assigned to this job
-  if (job.assigned_printer_id !== session.user.id) {
+  if (job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id) {
     redirect("/dashboard");
   }
 

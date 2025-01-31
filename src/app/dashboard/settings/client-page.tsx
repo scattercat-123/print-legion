@@ -154,6 +154,26 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
             </p>
           </div>
 
+          <div>
+            <label
+              htmlFor="preferred_ysws"
+              className="block text-sm font-medium mb-2"
+            >
+              Preferred YSWS
+            </label>
+            <YSWS_Selector />
+            <p className="mt-1 text-xs text-zinc-400">
+              Pick the you-ship-we-ships you'd like to see more of. You still
+              see prints from all of them, but these will be prioritized in
+              search.{" "}
+              {selectedLength === serverYSWSOptions.length && (
+                <span className="text-red-500">
+                  (Well done! Selecting them all is like... selecting none.)
+                </span>
+              )}
+            </p>
+          </div>
+
           <div className="flex items-center space-x-2">
             <Checkbox
               id="has_printer"
@@ -168,26 +188,6 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
 
           {hasPrinter && (
             <>
-              <div>
-                <label
-                  htmlFor="preferred_ysws"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Preferred YSWS
-                </label>
-                <YSWS_Selector />
-                <p className="mt-1 text-xs text-zinc-400">
-                  Pick the you-ship-we-ships you'd like to see more of. You
-                  still see prints from all of them, but these will be
-                  prioritized in search.{" "}
-                  {selectedLength === serverYSWSOptions.length && (
-                    <span className="text-red-500">
-                      (Well done! Selecting them all is like... selecting none.)
-                    </span>
-                  )}
-                </p>
-              </div>
-
               <div>
                 <label
                   htmlFor="printer_type"

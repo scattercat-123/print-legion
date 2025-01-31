@@ -13,8 +13,7 @@ export default async function SubmissionsPage() {
   }
 
   const jobs = await cached_searchJobs({
-    query: `{(auto)(creator)slack_id} = '${session.user.id}'`,
-    mode: "formula",
+    formula: `{(auto)(creator)slack_id} = '${session.user.id}'`,
   });
 
   if (jobs.length === 0) {

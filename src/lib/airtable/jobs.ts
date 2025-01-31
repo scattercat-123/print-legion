@@ -3,29 +3,18 @@ import { JobSchema, type Job } from "../types";
 
 // Search helper
 export async function searchJobs({
-  query,
-  mode = "search",
+  formula,
   offset = 0,
   maxRecords = 25,
 }: {
-  query?: string;
-  mode?: "search" | "formula";
+  formula?: string;
   offset?: number;
   maxRecords?: number;
 }) {
-  const _query = query?.toLowerCase().trim();
   try {
     const records = await jobsTable
       .select({
-        filterByFormula:
-          mode === "search"
-            ? `OR(
-            SEARCH("${_query}", LOWER({item_name})),
-            SEARCH("${_query}", LOWER({item_description})),
-            SEARCH("${_query}", LOWER({ysws_pr_url})),
-            SEARCH("${_query}", LOWER(ARRAYJOIN({(auto)(creator)slack_id})))
-            )`
-            : query,
+        filterByFormula: formula,
         offset,
         maxRecords,
       })
