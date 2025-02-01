@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Briefcase,
   Search,
@@ -15,6 +14,8 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import type { User } from "@/lib/types";
 import { OnboardingWrapper } from "./onboarding";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const cached_getById = cache(getById);
 
@@ -95,50 +96,21 @@ export default async function DashboardLayout({
   const navItems = computeNavItems(user);
   return (
     <OnboardingWrapper user={user}>
-      <div className="flex h-screen overflow-hidden bg-black">
-        {/* Sidebar */}
-        <div className="w-64 border-r border-zinc-800">
-          <div className="flex flex-col h-full justify-between py-4">
-            {/* Top section with main tabs */}
-            <div className="px-3 py-2">
-              <div className="space-y-1">
-                {navItems.slice(0, -1).map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start gap-2 font-normal",
-                        "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
-                      )}
-                    >
-                      {item.icon}
-                      {item.title}
-                    </Button>
-                  </Link>
-                ))}
-              </div>
+      <SidebarProvider defaultOpen>
+        <div className="flex min-h-screen bg-black w-full" data-theme="dark">
+          <DashboardSidebar navItems={navItems} />
+          <main className="flex-1 rounded-xl bg-black w-full">
+            
+            <div className="flex items-center border-b p-1 h-[2.55rem]">
+              <SidebarTrigger />
+              {/* todo: figure out what to put here in the future lol but calm for now */}
             </div>
-
-            {/* Bottom section with settings */}
-            <div className="px-3 py-2">
-              <Link href={navItems[navItems.length - 1].href}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start gap-2 font-normal text-zinc-400 hover:text-zinc-50 hover:bg-zinc-900"
-                >
-                  {navItems[navItems.length - 1].icon}
-                  {navItems[navItems.length - 1].title}
-                </Button>
-              </Link>
+            <div className="p-3 sm:p-6">
+              {children}
             </div>
-          </div>
+          </main>
         </div>
-
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto p-8 text-zinc-200">
-          {children}
-        </main>
-      </div>
+      </SidebarProvider>
     </OnboardingWrapper>
   );
 }
