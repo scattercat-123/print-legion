@@ -54,10 +54,21 @@ export function MarkFulfilledButton({
 
     try {
       setIsLoading(true);
-      await markFulfilled(jobId, {
-        file: selectedFile,
-        description,
+      await markFulfilled(jobId, description);
+
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", selectedFile);
+      uploadFormData.append("fileType", "fulfillment_photo");
+
+      const response = await fetch(`/api/jobs/${jobId}/upload`, {
+        method: "POST",
+        body: uploadFormData,
       });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload fulfillment photo`);
+      }
+
       toast.success("Job marked as fulfilled", {
         description: "Waiting for the submitter to confirm receipt.",
       });

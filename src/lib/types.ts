@@ -68,6 +68,8 @@ export const JobSchema = z.object({
 
   fulfilment_photo: z.array(AirtableAttachmentSchema).optional(),
   gcode_files: z.array(AirtableAttachmentSchema).optional(),
+
+  handoff_comments: z.string().optional(),
 });
 
 // Printer table schema

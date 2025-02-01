@@ -160,6 +160,10 @@ export async function createJob(formData: FormData) {
     throw new Error("Failed to create job");
   }
 
+  await updateBySlackId("user", session.user.id, {
+    has_ever_submitted: true,
+  });
+
   revalidatePath("/dashboard/jobs");
   return { success: true, jobId: result.id };
 }

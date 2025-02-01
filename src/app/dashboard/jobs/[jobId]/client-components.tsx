@@ -164,7 +164,7 @@ export const PrinterDetails = ({
                     </div>
                   )}
                   {user.region_coordinates && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm">
                       <MapPin className="h-4 w-4" />
                       <span>Region available</span>
                     </div>

@@ -65,10 +65,7 @@ export async function completePrinting(
   throw new Error("Failed to complete printing");
 }
 
-export async function markFulfilled(
-  jobId: string,
-  fulfillmentPhoto: FulfillmentPhoto
-) {
+export async function markFulfilled(jobId: string, description?: string) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Not authenticated");
@@ -83,14 +80,9 @@ export async function markFulfilled(
     throw new Error("Not authorized to mark this job as fulfilled");
   }
 
-  // TODO: Upload fulfillment photo using existing upload logic
-  // const uploadFormData = new FormData();
-  // uploadFormData.append("file", fulfillmentPhoto.file);
-  // uploadFormData.append("fileType", "fulfillment_photo");
-  // uploadFormData.append("description", fulfillmentPhoto.description || "");
-
   const success = await updateBySlackId("job", jobId, {
     status: "fulfilled_awaiting_confirmation" as JobStatusType,
+    handoff_comments: description,
   });
 
   if (success) {

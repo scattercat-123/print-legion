@@ -17,20 +17,31 @@ export async function POST(
     if (!job) {
       return new NextResponse("Job not found", { status: 404 });
     }
-    if (job["(auto)(creator)slack_id"]?.[0] !== session.user.id) {
-      return new NextResponse("Unauthorized", { status: 403 });
-    }
 
     // Get the file and metadata from the request
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const isMain = formData.get("isMain") === "true";
-    const fileType = formData.get("fileType") as "stl" | "image";
+    const fileType = formData.get("fileType") as
+      | "stl"
+      | "image"
+      | "fulfillment_photo";
+
+    if (
+      ["stl", "image"].includes(fileType)
+        ? job["(auto)(creator)slack_id"]?.[0] !== session.user.id
+        : job["(auto)(assigned_printer)slack_id"]?.[0] !== session.user.id
+    ) {
+      return new NextResponse("Unauthorized", { status: 403 });
+    }
 
     if (!file) {
       return new NextResponse("No file provided", { status: 400 });
     }
-    if (!fileType || !["stl", "image"].includes(fileType)) {
+    if (
+      !fileType ||
+      !["stl", "image", "fulfillment_photo"].includes(fileType)
+    ) {
       return new NextResponse("Invalid file type", { status: 400 });
     }
 
@@ -38,7 +49,12 @@ export async function POST(
     const buffer = await file.arrayBuffer();
 
     // Upload to Airtable
-    const uploadEndpoint = fileType === "stl" ? "stls" : "user_images";
+    // const uploadEndpoint = fileType === "stl" ? "stls" : "user_images";
+    const uploadEndpoint = {
+      stl: "stls",
+      image: "user_images",
+      fulfillment_photo: "fulfilment_photo",
+    }[fileType];
     const response = await fetch(
       `https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/${uploadEndpoint}/uploadAttachment`,
       {
