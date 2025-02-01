@@ -28,6 +28,7 @@ export async function GET(request: Request) {
           SEARCH("${q}", LOWER({item_name})),
           SEARCH("${q}", LOWER({item_description})),
           SEARCH("${q}", LOWER({ysws_pr_url})),
+          SEARCH("${q}", LOWER(ARRAYJOIN({(auto)(ysws)name}))),
           SEARCH("${q}", LOWER(ARRAYJOIN({(auto)(creator)slack_id})))
         ),
         {(auto)(assigned_printer)slack_id}=''

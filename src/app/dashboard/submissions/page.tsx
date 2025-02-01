@@ -27,7 +27,7 @@ export default async function SubmissionsPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-semibold">Your Submissions</h1>
-      <div className="grid gap-4">
+      <div className="grid gap-2">
         {jobs.map((job) => (
           <JobCard key={job.id} job={job} />
         ))}

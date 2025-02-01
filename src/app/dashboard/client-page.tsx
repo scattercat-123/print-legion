@@ -94,7 +94,7 @@ export default function DashboardPage({
       {recentActivity?.recentJobs && recentActivity.recentJobs.length > 0 && (
         <div className="!mt-8">
           <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-          <div className="grid gap-4">
+          <div className="grid gap-2">
             {recentActivity.recentJobs.map((job) => (
               <JobCard key={job.id} job={job} />
             ))}

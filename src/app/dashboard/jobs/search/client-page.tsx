@@ -10,7 +10,6 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { User } from "@/lib/types";
 
 export default function SearchPage({ user }: { user: User }) {
-  console.log(user);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery, 500);
 
@@ -27,7 +26,7 @@ export default function SearchPage({ user }: { user: User }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div className="flex items-center space-x-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
@@ -55,7 +54,7 @@ export default function SearchPage({ user }: { user: User }) {
         </div>
       ) : (
         <>
-          <div className="grid gap-4">
+          <div className="grid gap-2">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} />
             ))}

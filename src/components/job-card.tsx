@@ -50,7 +50,7 @@ function JobCardComponent({
                 {job.item_description.length > 100 && "..."}
               </p>
             )}
-            <div className="flex flex-row gap-1 mt-1">
+            <div className="inline-flex flex-wrap gap-1 mt-1">
               {job.part_count && (
                 <Badge variant="secondary-static" className="text-xs">
                   {job.part_count} part{job.part_count > 1 ? "s" : ""}
@@ -96,6 +96,7 @@ function JobCardComponent({
               onClick={() => window.open(job.ysws_pr_url, "_blank")}
               variant="secondary"
               size="sm"
+              className="hidden xs:inline-flex"
             >
               <Github className="w-4 h-4 mr-1.5" />
               View PR
