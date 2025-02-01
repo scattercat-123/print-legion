@@ -286,8 +286,10 @@ export function OnboardingDialog({
       data.current.user_type = stepData;
       if (stepData === "printer") {
         setStep(3);
-        return;
+      } else {
+        setStep(4);  // Skip printer config for requestors
       }
+      return;
     } else if (step === 3) {
       data.current.printer_brand = stepData.printerBrand;
       data.current.build_volume = stepData.buildVolume;
