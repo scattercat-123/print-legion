@@ -11,8 +11,7 @@ export default async function PrintsPage() {
   }
 
   const jobs = await searchJobs({
-    query: `{(auto)(assigned_printer)slack_id} = '${session.user.id}'`,
-    mode: "formula",
+    formula: `{(auto)(assigned_printer)slack_id} = '${session.user.id}'`,
   });
 
   if (jobs.length === 0) {

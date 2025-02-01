@@ -17,6 +17,8 @@ export async function GET(
       return new NextResponse("Job not found", { status: 404 });
     }
 
+    job["(auto)(creator)region_coordinates"] = undefined;
+
     return NextResponse.json(job);
   } catch (error) {
     console.error("Error fetching job:", error);

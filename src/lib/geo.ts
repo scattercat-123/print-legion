@@ -1,3 +1,6 @@
+export const COORDINATES_REGEX =
+  /^([-+]?\d{1,2}[.]\d+),\s*([-+]?\d{1,3}[.]\d+)$/;
+
 export interface GeocodingResult {
   place_id: number;
   lat: string;

@@ -10,6 +10,7 @@ import {
   DownloadIcon,
   FileIcon,
   GithubIcon,
+  MapPin,
   PencilIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,10 +31,10 @@ export default async function JobPage({
   }
 
   const jobId = (await params).jobId;
-  const [user, job] = await Promise.all([
-    cached_getById("user", session.user.id) as Promise<User>,
-    cached_getById("job", jobId),
-  ]);
+  const user = await cached_getById("user", session.user.id);
+  const job = await cached_getById("job", jobId, {
+    coordinatesForDistance: user?.region_coordinates,
+  });
 
   const assignedPrinterId = job?.["(auto)(assigned_printer)slack_id"]?.[0];
 
@@ -63,7 +64,7 @@ export default async function JobPage({
           <h1 className="text-2xl font-semibold tracking-tight">
             {job.item_name || "Untitled Job"}
           </h1>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
             <Badge variant="secondary-static" className="text-xs">
               {job.part_count || 0} part{job.part_count !== 1 ? "s" : ""}
             </Badge>
@@ -73,6 +74,13 @@ export default async function JobPage({
                 className={cn("text-xs", STATUS_AESTHETIC[job.status].color)}
               >
                 {STATUS_AESTHETIC[job.status].text}
+              </Badge>
+            )}
+
+            {job.distance !== undefined && job.distance > 0.0 && (
+              <Badge variant="secondary-static" className="text-xs pl-1.5">
+                <MapPin className="size-[0.875rem] shrink-0 mr-0.5" />~
+                {job.distance.toFixed(1)} km
               </Badge>
             )}
           </div>

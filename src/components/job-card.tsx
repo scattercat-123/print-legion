@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
-import { ArrowUpRightIcon, Github } from "lucide-react";
+import { ArrowUpRightIcon, Github, MapPin } from "lucide-react";
 import { STATUS_AESTHETIC } from "@/lib/consts";
 
 interface JobCardProps {
-  job: Job & { id: string };
+  job: Job & { id: string; distance?: number };
   isAssigned?: boolean;
   className?: string;
 }
@@ -63,6 +63,19 @@ function JobCardComponent({
                   className={cn("text-xs", STATUS_AESTHETIC[job.status].color)}
                 >
                   {STATUS_AESTHETIC[job.status].text}
+                </Badge>
+              )}
+
+              {job["(auto)(ysws)name"] && (
+                <Badge variant="secondary-static" className="text-xs">
+                  {job["(auto)(ysws)name"]}
+                </Badge>
+              )}
+
+              {job.distance !== undefined && job.distance > 0.0 && (
+                <Badge variant="secondary-static" className="text-xs pl-1.5">
+                  <MapPin className="size-[0.875rem] shrink-0 mr-0.5" />~
+                  {job.distance.toFixed(1)} km
                 </Badge>
               )}
             </div>

@@ -1,12 +1,22 @@
 import type { FieldSet, Record } from "airtable";
 import { usersTable, jobsTable } from ".";
 import { JobSchema, UserSchema, type Job, type User } from "../types";
+import { getDistance } from "../distance";
 
 // Helper functions
 export async function getById<T extends "job" | "user">(
   type: T,
-  id: string
-): Promise<((T extends "job" ? Job : User) & { id: string }) | null> {
+  id: string,
+  {
+    includeSensitiveFields = false,
+    coordinatesForDistance,
+  }: {
+    includeSensitiveFields?: boolean;
+    coordinatesForDistance?: string;
+  } = {}
+): Promise<
+  ((T extends "job" ? Job : User) & { id: string; distance?: number }) | null
+> {
   console.log(`[getById] ${type} ${id}`);
   try {
     let record: Record<FieldSet>;
@@ -35,8 +45,30 @@ export async function getById<T extends "job" | "user">(
       console.error("Failed to parse record:", parsed.error);
       return null;
     }
-    return { ...parsed.data, id: record.id } as unknown as (T extends "job"
-      ? Job
+    let final = { ...parsed.data, id: record.id };
+
+    if (type === "job") {
+      const coords = record.fields["(auto)(creator)region_coordinates"];
+      if (
+        coordinatesForDistance &&
+        coords &&
+        (coords as string[]).length >= 1
+      ) {
+        Object.assign(final, {
+          distance: getDistance(
+            coordinatesForDistance,
+            (coords as string[])[0]
+          ),
+        });
+      }
+
+      if (!includeSensitiveFields) {
+        (final as Job)["(auto)(creator)region_coordinates"] = undefined;
+      }
+    }
+
+    return final as unknown as (T extends "job"
+      ? Job & { distance?: number }
       : User) & {
       id: string;
     };
