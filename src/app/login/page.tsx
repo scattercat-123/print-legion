@@ -40,7 +40,7 @@ export default async function LoginPage() {
               Sign in with Slack
             </Button>
 
-            {process.env.NODE_ENV === "development" && <ImpersonateBtn />}
+            {process.env.NODE_ENV === "meow" && <ImpersonateBtn />}
           </div>
 
           <div className="text-sm text-muted-foreground">

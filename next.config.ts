@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
     },
     reactCompiler: true,
     cpus: 8,
-  }
+  
+  },
+  devIndicators:{appIsrStatus:false}
 };
 
 export default nextConfig;
