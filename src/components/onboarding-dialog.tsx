@@ -102,7 +102,7 @@ const WelcomeStep = ({ onNext }: StepProps) => {
         {ASCII_LOGO}
       </pre>
       <div className="terminal-output">
-        <p className="text-green-400">Welcome to Hack Club Launchpad!</p>
+        <p className="text-green-400">Welcome to Hack Club print_legion!</p>
         <p className="text-gray-400 mt-2">
           This platform connects Hack Clubbers who need 3D printed parts with
           those who can print them.
@@ -437,7 +437,7 @@ const FinalStep = ({ onNext, loading }: StepProps) => {
     <div className="terminal-output">
       <p className="text-green-400">🎉 Setup Complete!</p>
       <p className="text-gray-400 mt-2">
-        You&apos;re all set to start using Launchpad.
+        You&apos;re all set to start using print_legion.
       </p>
       {loading ? (
         <p className="text-yellow-400 mt-4">Processing...</p>
@@ -607,8 +607,10 @@ export function OnboardingDialog({
         hasCloseButton={false}
       >
         <VisuallyHidden>
-          <DialogTitle>Terminal - Launchpad Setup</DialogTitle>
-          <DialogDescription>Welcome to Hack Club Launchpad!</DialogDescription>
+          <DialogTitle>hackterm2 - print_legion/setup</DialogTitle>
+          <DialogDescription>
+            Welcome to Hack Club print_legion!
+          </DialogDescription>
         </VisuallyHidden>
         <div className="bg-black/90 p-2 flex items-center justify-between border-b border-green-500/20 h-[2.375rem]">
           <div className="flex items-center gap-2">
@@ -617,7 +619,7 @@ export function OnboardingDialog({
             <div className="w-3 h-3 rounded-full bg-green-500" />
           </div>
           <div className="text-green-400 text-sm select-none">
-            Terminal - Launchpad Setup
+            hackterm2 - print_legion/setup
           </div>
           <div className="w-16" />
         </div>
