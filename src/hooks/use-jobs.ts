@@ -3,8 +3,16 @@ import type { Job } from "@/lib/types";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(errorCodes[data.code as keyof typeof errorCodes]);
+  return data;
+};
+
+const errorCodes = {
+  401: "Unauthorized",
+  701: "Since nearby jobs are shown based on your location, please set your location in settings, then try again.",
+  500: "Seems like we had a little hiccup. Please try again later.",
 };
 
 // Hook for infinite scrolling job search
@@ -28,7 +36,7 @@ export function useJobSearch(query: string, coordinates?: string) {
   return {
     jobs,
     isLoading,
-    isError: error,
+    error,
     size,
     setSize,
     isReachingEnd,

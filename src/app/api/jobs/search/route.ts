@@ -8,19 +8,34 @@ export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { code: 401, message: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const user = await getById("user", session.user.id);
     if (!user) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { code: 401, message: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
+    const coordinates = searchParams.get("coordinates");
+
     const page = Number.parseInt(searchParams.get("page") || "0", 10);
 
     const q = query.toLowerCase().trim();
+
+    if (!coordinates || !coordinates.match(COORDINATES_REGEX)) {
+      return NextResponse.json(
+        { code: 701, message: "Missing coordinates" },
+        { status: 400 }
+      );
+    }
 
     const base_formula = dedent`
       AND(
@@ -69,7 +84,6 @@ export async function GET(request: Request) {
       });
     }
 
-    const coordinates = searchParams.get("coordinates");
     jobs = jobs.map((job) => {
       const job_coords = job["(auto)(creator)region_coordinates"];
       if (coordinates && job_coords && job_coords.length >= 1) {
@@ -86,6 +100,9 @@ export async function GET(request: Request) {
     return NextResponse.json(jobs);
   } catch (error) {
     console.error("Error searching jobs:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json(
+      { code: 500, message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

@@ -38,13 +38,30 @@ function JobCardComponent({ job, className }: JobCardProps) {
       <div className="flex flex-col w-full">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-medium">{job.item_name || "Untitled Job"}</h3>
-            {job.item_description && (
-              <p className="text-sm text-zinc-500">
-                {job.item_description.slice(0, 100).trim()}
-                {job.item_description.length > 100 && "..."}
-              </p>
-            )}
+            <div className="flex gap-2">
+              <div className="flex-col">
+                <h3 className="font-medium text-sm xs:text-base">
+                  {job.item_name || "Untitled Job"}
+                </h3>
+                {job.item_description && (
+                  <p className="text-xs xs:text-sm text-zinc-500">
+                    {job.item_description.slice(0, 100).trim()}
+                    {job.item_description.length > 100 && "..."}
+                  </p>
+                )}
+              </div>
+
+              {thumbnailUrl && (
+                <div className="w-full max-w-[6rem] xs:max-w-[7.375rem] sm:hidden flex shrink-0">
+                  <img
+                    // src={`https://picsum.photos/400/400?random=${job.id}`}
+                    src={thumbnailUrl}
+                    alt="Job"
+                    className="size-[6rem] xs:size-[7.375rem] object-contain rounded-md border-dashed border border-border"
+                  />
+                </div>
+              )}
+            </div>
             <div className="inline-flex flex-wrap gap-1 mt-1">
               {job.part_count && (
                 <Badge variant="secondary-static" className="text-xs">
@@ -100,7 +117,7 @@ function JobCardComponent({ job, className }: JobCardProps) {
         </div>
       </div>
       {thumbnailUrl && (
-        <div className="w-full max-w-[7.375rem] hidden md:flex">
+        <div className="w-full max-w-[7.375rem] hidden sm:flex">
           <img
             // src={`https://picsum.photos/400/400?random=${job.id}`}
             src={thumbnailUrl}

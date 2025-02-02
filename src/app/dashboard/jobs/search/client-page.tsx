@@ -5,16 +5,19 @@ import { useJobSearch } from "@/hooks/use-jobs";
 import { JobCard } from "@/components/job-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { MessageCircleQuestion, Search, TriangleAlert } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { User } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage({ user }: { user: User }) {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery, 500);
 
-  const { jobs, isLoading, isError, size, setSize, isReachingEnd } =
-    useJobSearch(debouncedQuery, user?.region_coordinates);
+  const { jobs, isLoading, error, size, setSize, isReachingEnd } = useJobSearch(
+    debouncedQuery,
+    user?.region_coordinates
+  );
 
   console.log(jobs);
   const loadMore = useCallback(() => {
@@ -39,18 +42,44 @@ export default function SearchPage({ user }: { user: User }) {
           />
         </div>
       </div>
-
       {isLoading && jobs.length === 0 ? (
-        <div className="flex items-center justify-center h-64">
-          <p className="text-zinc-400">Loading jobs...</p>
+        <div className="flex flex-col gap-2">
+          <Skeleton className="w-full h-[10.75rem] rounded-xl" />
+          <Skeleton className="w-full h-[10.75rem] rounded-xl" />
+          <Skeleton className="w-full h-[10.75rem] rounded-xl" />
         </div>
-      ) : isError ? (
-        <div className="flex items-center justify-center h-64">
-          <p className="text-red-400">Error loading jobs</p>
+      ) : error ? (
+        <div className="flex justify-center flex-col text-red-400">
+          <h3 className="text-lg font-semibold flex tracking-tight items-center gap-2">
+            <TriangleAlert className="w-5 h-5" />
+            Error
+          </h3>
+          <span className="text-sm">{(error as Error).message}</span>
         </div>
       ) : jobs.length === 0 ? (
-        <div className="flex items-center justify-center h-64">
-          <p className="text-zinc-400">No jobs found</p>
+        <div className="flex justify-center flex-col text-muted-foreground">
+          <h3 className="text-lg font-semibold flex tracking-tight items-center gap-2">
+            <MessageCircleQuestion className="w-5 h-5" />
+            No results
+          </h3>
+          <span className="text-sm">
+            {debouncedQuery.length > 0 ? (
+              "Seems like we couldn't find any results for your search - try a different search term?"
+            ) : (
+              <span>
+                Seems like we couldn't find any jobs in your area - maybe ask
+                around in{" "}
+                <a
+                  href="https://hackclub.slack.com/archives/C083P4FJM46"
+                  target="_blank"
+                  className="underline hover:text-primary transition-colors"
+                >
+                  #printing-legion
+                </a>
+                ?
+              </span>
+            )}
+          </span>
         </div>
       ) : (
         <>
