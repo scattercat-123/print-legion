@@ -1,6 +1,8 @@
 # Print Legion
 A platform to connect Hack clubbers who need their YSWS parts printed with those who have a 3D printer!
 
+Officially launches Feb 3rd!! Join #printing-legion for more info.
+
 ## Features
 
 ### Authentication & User Management
