@@ -1,21 +1,29 @@
-# printfarm
-a platform connecting communitu-sourced 3d printers with those needing prints. core features include slack login, job queues, and a reward system.
+# Print Legion
+A platform to connect Hack clubbers who need their YSWS parts printed with those who have a 3D printer!
 
-### todo list (generated from slack)
-- [X] repo access setup
-- [ ] airtable api integration
-- [X] slack api integration
-- [ ] user role implementation
-- [X] authentication implementation
-- [X] handle authentication states
-- [ ] basic job claiming logic
-- [ ] job expiration/drop logic
-- [ ] printer dashboard view
-- [ ] user dashboard view
-- [ ] currency system implementation
-- [ ] initial ui framework setup
-- [ ] basic api integration testing
-- [ ] basic website logic testing
+## Features
 
-### stack
-nextjs, typescript, airtable (as db), next-auth (slack only), tailwind, shadcn/ui
+### Authentication & User Management
+- Slack-based authentication for easy integration with the databases
+- Role-based system (Printer vs Requestor)
+- Terminal-style theme throughout the site
+- Able to define location/printer availability
+- Simple airtable integration to centrally store data
+- File upload support directly to airtable
+- Supports uploading picture of meetup
+
+### Core Functionality
+- **For Print Requestors:**
+  - Submit print jobs with support for STL files as well as images
+  - Set thumbnail images
+  - Tracking data from printer
+  - Confirmation of parts receipt before marking as finished
+  - Browse and search available prints (for fun!)
+
+- **For Printer Owners:**
+  - Able to set detailed printer specs (brand, volume, etc.)
+  - Easily claim jobs you can deliver
+  - Select a preferred YSWS to print for
+  - Status management (claimed → printing → completed)
+  - Track filament usage and print details
+  - Set region so you don't have to travel far!
