@@ -13,11 +13,14 @@ import {
   PencilIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ImageCarousel, PrinterDetails } from "./client-components";
+import { ImageCarousel, SlackCard } from "./client-components";
 import { JobStateButtons } from "./states/job-state-buttons";
 import { STATUS_AESTHETIC } from "@/lib/consts";
 import { cached_getById } from "../../layout";
 import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
+import { lazy } from "react";
+
+const Markdown = lazy(() => import("@/components/markdown"));
 
 export default async function JobPage({
   params,
@@ -35,7 +38,16 @@ export default async function JobPage({
     coordinatesForDistance: user?.region_coordinates,
   });
 
-  const assignedPrinterId = job?.["(auto)(assigned_printer)slack_id"]?.[0];
+  if (!user || !job) {
+    notFound();
+  }
+
+  const assignedPrinterId = job["(auto)(assigned_printer)slack_id"]?.[0];
+  const creatorSlackId = job["(auto)(creator)slack_id"]?.[0];
+
+  const creatorSlackInfoPromise = creatorSlackId
+    ? getSlackUserInfo(creatorSlackId)
+    : new Promise((r) => r(null));
 
   const printerSlackInfoPromise = assignedPrinterId
     ? getSlackUserInfo(assignedPrinterId)
@@ -43,15 +55,18 @@ export default async function JobPage({
   const printerUserPromise = assignedPrinterId
     ? cached_getById("user", assignedPrinterId)
     : new Promise((r) => r(null));
+
   const printerDataPromise = Promise.all([
     printerSlackInfoPromise,
     printerUserPromise,
   ]) as Promise<[SlackUserInfo | null, User | null]>;
-  if (!user || !job) {
-    notFound();
-  }
 
-  const isMyJob = job["(auto)(creator)slack_id"]?.[0] === session.user.id;
+  const creatorDataPromise = Promise.all([
+    creatorSlackInfoPromise,
+    new Promise((r) => r(user)),
+  ]) as Promise<[SlackUserInfo | null, User | null]>;
+
+  const isMyJob = creatorSlackId === session.user.id;
   const isPrinting = assignedPrinterId === session.user.id;
   const hasPrinter = user.printer_has ?? false;
 
@@ -117,9 +132,7 @@ export default async function JobPage({
       {job.item_description && (
         <div className="space-y-2">
           <h2 className="text-lg font-medium tracking-tight">Description</h2>
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {job.item_description}
-          </p>
+          <Markdown>{job.item_description}</Markdown>
         </div>
       )}
 
@@ -164,11 +177,18 @@ export default async function JobPage({
         </div>
       )}
 
-      {assignedPrinterId && assignedPrinterId !== session.user.id && (
-        <PrinterDetails promise={printerDataPromise} />
+      {creatorSlackId && creatorSlackId !== session.user.id && (
+        <SlackCard
+          title="Submitter"
+          promise={creatorDataPromise}
+          showPrinter={false}
+        />
       )}
 
-      {/* Action Buttons */}
+      {assignedPrinterId && assignedPrinterId !== session.user.id && (
+        <SlackCard title="Assigned printer" promise={printerDataPromise} />
+      )}
+
       <div className="flex flex-wrap gap-2 pt-4">
         <JobStateButtons
           jobId={jobId}

@@ -552,9 +552,12 @@ function PureCreateJobPage() {
             <div>
               <label
                 htmlFor="item_description"
-                className="block text-sm font-medium mb-2"
+                className="flex flex-col text-sm font-medium mb-2"
               >
                 Item Description
+                <span className="text-xs text-muted-foreground">
+                  We support markdown formatting!
+                </span>
               </label>
               <Textarea
                 id="item_description"

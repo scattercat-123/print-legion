@@ -93,10 +93,14 @@ export const ImageCarousel = ({
   );
 };
 
-export const PrinterDetails = ({
+export const SlackCard = ({
+  title,
   promise,
+  showPrinter = true,
 }: {
+  title: string;
   promise: Promise<[SlackUserInfo | null, User | null] | null>;
+  showPrinter?: boolean;
 }) => {
   const data = use(promise);
   const slackUser = data?.[0];
@@ -113,13 +117,11 @@ export const PrinterDetails = ({
 
   return (
     <div className="flex flex-col">
-      <h2 className="text-lg font-medium tracking-tight mb-2">
-        Assigned printer
-      </h2>
+      <h2 className="text-lg font-medium tracking-tight mb-2">{title}</h2>
       <Card className="max-w-md">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <div className="flex-grow space-y-4">
+            <div className="flex-grow space-y-3">
               <div className="flex items-center gap-4">
                 <div className="shrink-0">
                   <img
@@ -138,31 +140,30 @@ export const PrinterDetails = ({
                 </div>
               </div>
 
+              <p className="text-sm text-muted-foreground">
+                {slackUser.profile.title}
+              </p>
+
               {user.printer_has && (
                 <div className="space-y-2">
-                  {(user.printer_details || user.printer_type) && (
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        <Printer className="h-4 w-4" />
-                        Printer details
-                      </div>
+                  {showPrinter &&
+                    (user.printer_details || user.printer_type) && (
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          <Printer className="h-4 w-4" />
+                          Printer details
+                        </div>
 
-                      <span className="text-sm text-muted-foreground">
-                        {user.printer_type ?? "Printer type not specified"}
-                      </span>
-                      {user.printer_details && (
                         <span className="text-sm text-muted-foreground">
-                          {user.printer_details}
+                          {user.printer_type ?? "Printer type not specified"}
                         </span>
-                      )}
-                    </div>
-                  )}
-                  {user.region_coordinates && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4" />
-                      <span>Region available</span>
-                    </div>
-                  )}
+                        {user.printer_details && (
+                          <span className="text-sm text-muted-foreground">
+                            {user.printer_details}
+                          </span>
+                        )}
+                      </div>
+                    )}
                 </div>
               )}
 
