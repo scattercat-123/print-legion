@@ -7,8 +7,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useRef, useState, useEffect, useCallback } from "react";
-import { updateUserSettings } from "@/app/actions";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { updateUserSettings, searchLocations } from "@/app/actions";
 
 interface OnboardingDialogProps {
   open: boolean;
@@ -37,6 +37,7 @@ interface StepProps {
       | "printer"
       | "requestor"
       | { printerBrand: string; buildVolume: string }
+      | { value: string; label: string }
   ) => void;
   onBack?: () => void;
   loading?: boolean;
@@ -46,10 +47,12 @@ const CommandInput = ({
   onKeyDown,
   value,
   onChange,
+  placeholder,
 }: {
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -78,6 +81,14 @@ const CommandInput = ({
           onKeyDown={onKeyDown}
           spellCheck={false}
         />
+        {placeholder && !value && (
+          <span
+            className="absolute left-0 text-gray-500 pointer-events-none select-none"
+            style={{ marginLeft: "1ch" }}
+          >
+            {placeholder}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -258,6 +269,168 @@ const PrinterConfigStep = ({ onNext, onBack }: StepProps) => {
   return <div className="terminal-output">{renderPrompt()}</div>;
 };
 
+const LocationSearchStep = ({ onNext, onBack }: StepProps) => {
+  const [searchValue, setSearchValue] = useState("");
+  const [commandValue, setCommandValue] = useState("");
+  const [locationOptions, setLocationOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    value: string;
+    label: string;
+  } | null>(null);
+  const [mode, setMode] = useState<"search" | "select" | "confirm">("search");
+
+  const debouncedSearchLocation = useMemo(() => {
+    let timeoutId: NodeJS.Timeout;
+    return async (query: string) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!query.trim()) {
+        setLocationOptions([]);
+        return;
+      }
+
+      timeoutId = setTimeout(async () => {
+        setIsSearching(true);
+        try {
+          const results = await searchLocations(query);
+          setLocationOptions(results.slice(0, 5)); // Limit to 5 results
+        } catch (error) {
+          console.error("Failed to search locations:", error);
+        } finally {
+          setIsSearching(false);
+        }
+      }, 300);
+    };
+  }, []);
+
+  const handleLocationSelect = (location: { value: string; label: string }) => {
+    setSelectedLocation(location);
+    setMode("confirm");
+    setCommandValue("");
+  };
+
+  if (mode === "confirm") {
+    return (
+      <div className="terminal-output">
+        <p className="text-green-400">Confirm Location</p>
+        <p className="text-primary mt-2">
+          You selected:
+          <br />
+          <span className="text-gray-400"> {selectedLocation?.label}</span>
+        </p>
+        <p className="text-yellow-400 mt-4">Available commands:</p>
+        <p className="text-primary">1) confirm - Use this location</p>
+        <p className="text-primary">2) back - Search again</p>
+        <CommandInput
+          value={commandValue}
+          onChange={(e) => setCommandValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const value = (e.target as HTMLInputElement).value.toLowerCase();
+              if (value === "1" || value === "confirm") {
+                if (selectedLocation) onNext(selectedLocation);
+              } else if (value === "2" || value === "back") {
+                setMode("search");
+                setSearchValue("");
+                setCommandValue("");
+                setLocationOptions([]);
+              }
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (mode === "select") {
+    return (
+      <div className="terminal-output">
+        <p className="text-green-400">Location Search Results</p>
+        <div className="space-y-1">
+          {locationOptions.map((location, index) => (
+            <p key={location.value} className="text-primary">
+              {index + 1}) {location.label}
+            </p>
+          ))}
+        </div>
+        <p className="text-yellow-400 mt-4">Available commands:</p>
+        <p className="text-primary">
+          {locationOptions.length === 1 ? `1` : `1-${locationOptions.length}`})
+          select a location
+        </p>
+        <p className="text-primary">5) search - search locations again</p>
+        <p className="text-primary">6) back - previous step</p>
+        <CommandInput
+          value={commandValue}
+          onChange={(e) => setCommandValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const value = (e.target as HTMLInputElement).value.toLowerCase();
+              if (value === "5" || value === "search") {
+                setMode("search");
+                setSearchValue("");
+                setCommandValue("");
+                setLocationOptions([]);
+              } else if (value === "6" || value === "back") {
+                onBack?.();
+              } else {
+                const numValue = Number.parseInt(value, 10);
+                if (numValue >= 1 && numValue <= locationOptions.length) {
+                  handleLocationSelect(locationOptions[numValue - 1]);
+                }
+              }
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="terminal-output">
+      <p className="text-green-400">Location Search</p>
+      <p className="text-gray-400">
+        Enter your location to help us match you with nearby prints. Please do
+        not add your exact address, but rather a general area.
+      </p>
+      <div className="mt-1">
+        <CommandInput
+          value={searchValue}
+          onChange={(e) => {
+            setSearchValue(e.target.value);
+            debouncedSearchLocation(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && locationOptions.length > 0) {
+              setMode("select");
+              setCommandValue("");
+            }
+          }}
+          placeholder="Search for your location..."
+        />
+      </div>
+      {isSearching ? (
+        <p className="text-yellow-400 mt-2">Searching...</p>
+      ) : locationOptions.length > 0 ? (
+        <div className="space-y-1 mt-2">
+          {locationOptions.map((location, index) => (
+            <p key={location.value} className="text-primary">
+              {index + 1}) {location.label}
+            </p>
+          ))}
+          <p className="text-yellow-400 mt-1">
+            Press Enter to select from results
+          </p>
+        </div>
+      ) : searchValue ? (
+        <p className="text-yellow-400 mt-2">No locations found</p>
+      ) : null}
+    </div>
+  );
+};
+
 const FinalStep = ({ onNext, loading }: StepProps) => {
   const [inputValue, setInputValue] = useState("");
   return (
@@ -306,6 +479,7 @@ export function OnboardingDialog({
     user_type?: "printer" | "requestor";
     printer_brand?: string;
     build_volume?: string;
+    location?: { value: string; label: string };
   }>({});
 
   const handleNext = async (
@@ -313,20 +487,29 @@ export function OnboardingDialog({
       | "printer"
       | "requestor"
       | { printerBrand: string; buildVolume: string }
+      | { value: string; label: string }
   ) => {
     if (step === 2 && typeof stepData === "string") {
       console.log("Setting user type:", stepData);
       data.current.user_type = stepData;
-      if (stepData === "printer") {
-        setStep(3);
-      } else {
-        setStep(4);
-      }
+      setStep(stepData === "printer" ? 3 : 4);
       return;
-    } else if (step === 3 && typeof stepData === "object") {
+    } else if (
+      step === 3 &&
+      typeof stepData === "object" &&
+      "printerBrand" in stepData
+    ) {
       data.current.printer_brand = stepData.printerBrand;
       data.current.build_volume = stepData.buildVolume;
-    } else if (step === 4) {
+      setStep(4);
+    } else if (
+      step === 4 &&
+      typeof stepData === "object" &&
+      "value" in stepData
+    ) {
+      data.current.location = stepData;
+      setStep(5);
+    } else if (step === 5) {
       setLoading(true);
       const formData = new FormData();
       formData.append("onboarded", "on");
@@ -341,6 +524,10 @@ export function OnboardingDialog({
           `Build Volume: ${data.current.build_volume}`
         );
       }
+      if (data.current.location) {
+        formData.append("region_coordinates", data.current.location.value);
+        formData.append("region_complete_name", data.current.location.label);
+      }
       await updateUserSettings(formData);
       setLoading(false);
       onOpenChange(false);
@@ -350,6 +537,8 @@ export function OnboardingDialog({
   };
 
   const handleBack = () => {
+    if (step === 4)
+      return setStep(data.current.user_type === "printer" ? 3 : 2);
     if (step > 1) {
       setStep(step - 1);
     }
@@ -398,6 +587,8 @@ export function OnboardingDialog({
       case 3:
         return <PrinterConfigStep onNext={handleNext} onBack={handleBack} />;
       case 4:
+        return <LocationSearchStep onNext={handleNext} onBack={handleBack} />;
+      case 5:
         return <FinalStep onNext={handleNext} loading={loading} />;
       default:
         return null;
@@ -410,8 +601,8 @@ export function OnboardingDialog({
         className="font-mono bg-black/95 border border-green-500/20 rounded-lg overflow-hidden shadow-2xl fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col p-0"
         style={{
           maxWidth: "min(95vw, 600px)",
-          minHeight: "400px",
-          maxHeight: "min(95vh, 600px)",
+          minHeight: "440px",
+          maxHeight: "min(95vh, 700px)",
         }}
         hasCloseButton={false}
       >
@@ -430,7 +621,7 @@ export function OnboardingDialog({
           </div>
           <div className="w-16" />
         </div>
-        <div className="p-4 h-full overflow-y-auto terminal-content !text-sm sm:!text-base">
+        <div className="h-full overflow-y-auto terminal-content !text-sm sm:!text-base">
           {getStepContent()}
         </div>
       </DialogContent>
