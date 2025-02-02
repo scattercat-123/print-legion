@@ -16,12 +16,65 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+const ImageCard = ({
+  image,
+  main_image_id,
+  override_name,
+}: {
+  image: z.infer<typeof AirtableAttachmentSchema>;
+  main_image_id?: string;
+  override_name?: string;
+}) => {
+  return (
+    <CarouselItem
+      key={image.id}
+      className="basis-full md:basis-1/2 lg:basis-1/3"
+    >
+      <div className="relative aspect-square">
+        <img
+          src={image.url}
+          alt={image.filename}
+          className="absolute inset-0 object-cover w-full h-full rounded-lg border border-border"
+        />
+        {image.id === main_image_id && (
+          <Badge variant="secondary" className="absolute top-2 right-2">
+            Main Image
+          </Badge>
+        )}
+
+        <p className="absolute bottom-2 left-2 z-20 text-xs text-card-foreground bg-card/70 hover:bg-card transition-colors rounded-full px-1">
+          {override_name ||
+            (image.filename.length < 10
+              ? image.filename
+              : `${image.filename
+                  .split(".")
+                  .slice(0, -1)
+                  .join(".")
+                  .slice(0, 10)}.${image.filename.split(".").pop()}`)}
+        </p>
+
+        <button
+          className="absolute bottom-2 right-2 z-20 size-4 bg-card/60 hover:bg-card hover:scale-110 transition-all rounded-full flex items-center justify-center"
+          type="button"
+          onClick={() => {
+            window.open(image.url, "_blank");
+          }}
+        >
+          <DownloadIcon className="size-3" />
+        </button>
+      </div>
+    </CarouselItem>
+  );
+};
+
 export const ImageCarousel = ({
   user_images,
   main_image_id,
+  fulfillment_photo,
 }: {
   user_images?: z.infer<typeof AirtableAttachmentSchema>[];
   main_image_id?: string;
+  fulfillment_photo?: z.infer<typeof AirtableAttachmentSchema>[];
 }) => {
   return (
     user_images &&
@@ -37,47 +90,20 @@ export const ImageCarousel = ({
             className="w-full"
           >
             <CarouselContent>
-              {user_images.map((image) => (
-                <CarouselItem
+              {fulfillment_photo?.map((image) => (
+                <ImageCard
                   key={image.id}
-                  className="basis-full md:basis-1/2 lg:basis-1/3"
-                >
-                  <div className="relative aspect-square">
-                    <img
-                      src={image.url}
-                      alt={image.filename}
-                      className="absolute inset-0 object-cover w-full h-full rounded-lg border border-border"
-                    />
-                    {image.id === main_image_id && (
-                      <Badge
-                        variant="secondary"
-                        className="absolute top-2 right-2"
-                      >
-                        Main Image
-                      </Badge>
-                    )}
-
-                    <p className="absolute bottom-2 left-2 z-20 text-xs text-card-foreground bg-card/60 hover:bg-card transition-colors rounded-full px-1">
-                      {image.filename.length < 10
-                        ? image.filename
-                        : `${image.filename
-                            .split(".")
-                            .slice(0, -1)
-                            .join(".")
-                            .slice(0, 10)}.${image.filename.split(".").pop()}`}
-                    </p>
-
-                    <button
-                      className="absolute bottom-2 right-2 z-20 size-4 bg-card/60 hover:bg-card hover:scale-110 transition-all rounded-full flex items-center justify-center"
-                      type="button"
-                      onClick={() => {
-                        window.open(image.url, "_blank");
-                      }}
-                    >
-                      <DownloadIcon className="size-3" />
-                    </button>
-                  </div>
-                </CarouselItem>
+                  image={image}
+                  main_image_id={main_image_id}
+                  override_name="Fulfillment Photo"
+                />
+              ))}
+              {user_images.map((image) => (
+                <ImageCard
+                  key={image.id}
+                  image={image}
+                  main_image_id={main_image_id}
+                />
               ))}
             </CarouselContent>
             <div className="flex w-full mt-2">

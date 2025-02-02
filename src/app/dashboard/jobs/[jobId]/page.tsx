@@ -18,7 +18,7 @@ import { JobStateButtons } from "./states/job-state-buttons";
 import { STATUS_AESTHETIC } from "@/lib/consts";
 import { cached_getById } from "../../layout";
 import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
-import { lazy } from "react";
+import { lazy, useMemo } from "react";
 
 const Markdown = lazy(() => import("@/components/markdown"));
 
@@ -69,6 +69,8 @@ export default async function JobPage({
   const isMyJob = creatorSlackId === session.user.id;
   const isPrinting = assignedPrinterId === session.user.id;
   const hasPrinter = user.printer_has ?? false;
+
+  const files = [...(job.stls || []), ...(job.gcode_files || [])];
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -137,37 +139,50 @@ export default async function JobPage({
       )}
 
       <ImageCarousel
+        fulfillment_photo={
+          session.user.id === creatorSlackId ||
+          session.user.id === assignedPrinterId
+            ? job.fulfilment_photo
+            : undefined
+        }
         user_images={job.user_images}
         main_image_id={job.main_image_id}
       />
 
-      {/* STL Files */}
-      {job.stls && job.stls.length > 0 && (
+      {/* Files */}
+      {files.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-medium tracking-tight">STL Files</h2>
+          <h2 className="text-lg font-medium tracking-tight">Files</h2>
           <div className="grid gap-2">
-            {job.stls.map((stl) => (
+            {files.map((file) => (
               <a
-                key={stl.id}
-                href={stl.url}
+                key={file.id}
+                href={file.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3 bg-card hover:bg-muted/50 rounded-lg border border-border transition-colors group"
+                className="flex items-center gap-3 px-2.5 py-1.5 bg-card hover:bg-muted/50 rounded-lg border border-border transition-colors group"
               >
                 <div className="p-2 bg-muted rounded-md">
                   <FileIcon className="size-4 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {stl.filename}
-                    {stl.id === job.main_stl_id && (
+                  <span className="text-sm font-medium truncate">
+                    <span className="xs:hidden">
+                      {file.filename.length > 25
+                        ? `${file.filename.slice(0, 18).trim()}.${file.filename
+                            .split(".")
+                            .pop()}`
+                        : file.filename}
+                    </span>
+                    <span className="hidden xs:inline">{file.filename}</span>
+                    {file.id === job.main_stl_id && (
                       <Badge variant="secondary" className="ml-2">
                         Main File
                       </Badge>
                     )}
-                  </p>
+                  </span>
                   <p className="text-xs text-muted-foreground">
-                    {Math.round(stl.size / 1024)}KB
+                    {Math.round(file.size / 1024)}KB
                   </p>
                 </div>
                 <DownloadIcon className="size-4 text-muted-foreground group-hover:text-primary transition-opacity" />

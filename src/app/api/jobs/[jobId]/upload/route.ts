@@ -25,7 +25,8 @@ export async function POST(
     const fileType = formData.get("fileType") as
       | "stl"
       | "image"
-      | "fulfillment_photo";
+      | "fulfillment_photo"
+      | "gcode_file";
 
     if (
       ["stl", "image"].includes(fileType)
@@ -40,7 +41,7 @@ export async function POST(
     }
     if (
       !fileType ||
-      !["stl", "image", "fulfillment_photo"].includes(fileType)
+      !["stl", "image", "fulfillment_photo", "gcode_file"].includes(fileType)
     ) {
       return new NextResponse("Invalid file type", { status: 400 });
     }
@@ -54,6 +55,7 @@ export async function POST(
       stl: "stls",
       image: "user_images",
       fulfillment_photo: "fulfilment_photo",
+      gcode_file: "gcode_files",
     }[fileType];
     const response = await fetch(
       `https://content.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${job.id}/${uploadEndpoint}/uploadAttachment`,
