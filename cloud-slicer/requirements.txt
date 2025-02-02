@@ -1,0 +1,5 @@
+modal
+requests 
+bpy==4.10
+argparse
+mathutils
