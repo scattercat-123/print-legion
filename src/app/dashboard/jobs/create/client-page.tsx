@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +9,6 @@ import {
   YSWS_SelectorProvider,
 } from "@/hooks/use-ysws-search";
 import YSWS_Selector from "@/hooks/use-ysws-search";
-import { User } from "@/lib/types";
 import { toast } from "sonner";
 import {
   ImageIcon,
@@ -41,18 +39,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function CreateJobPage({
-  settingsData,
-}: {
-  settingsData: User;
-}) {
+export default function CreateJobPage() {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
   return (
     <YSWS_SelectorProvider
-      getInitialValue={(yswsData) => {
+      getInitialValue={() => {
         if (isMounted && localStorage.getItem("createJob_ysws")) {
           return JSON.parse(localStorage.getItem("createJob_ysws") || "[]");
         }
@@ -68,7 +62,6 @@ export default function CreateJobPage({
 }
 
 function PureCreateJobPage() {
-  const router = useRouter();
   const [files, setFiles] = useState<{
     images: File[];
     stls: File[];
@@ -459,7 +452,7 @@ function PureCreateJobPage() {
             Click the star to set the main{" "}
             {type === "image" ? "image" : "3D model"}.{" "}
             {type === "image"
-              ? "The main image will be shown when searching for your item, to help people see what you're printing. The rest will be shown when people view the details of your job."
+              ? "The main image will be shown when searching for your item, to help people see what you&apos;re printing. The rest will be shown when people view the details of your job."
               : "All models will be printed, but the main one may be used to generate 3D preview images in the future."}
           </span>
         )}
@@ -528,11 +521,11 @@ function PureCreateJobPage() {
             <li>Upload the STL files, images, etc. Submit!</li>
             <li>
               Somebody in your area may claim the job and print it - you can
-              monitor your print's progress in the dashboard.
+              monitor your print&apos;s progress in the dashboard.
             </li>
             <li>
-              You'll communicate with the person who prints your job via Slack
-              to arrange pickup.
+              You&apos;ll communicate with the person who prints your job via
+              Slack to arrange pickup. to arrange pickup.
             </li>
           </ul>
         </div>
@@ -701,7 +694,8 @@ function PureCreateJobPage() {
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete
-                    everything you've entered, and you'll have to start over.
+                    everything you&apos;ve entered, and you&apos;ll have to
+                    start over.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -3,10 +3,6 @@ import { signIn } from "@/lib/auth";
 import { FaSlack } from "react-icons/fa";
 import Image from "next/image";
 import cherryMX from "@media/switch.png";
-import { Input } from "@/components/ui/input";
-import { ArrowRightIcon, UserCheck2Icon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import { ImpersonateBtn } from "./impersonate-btn";
 
 export default async function LoginPage() {
@@ -40,7 +36,7 @@ export default async function LoginPage() {
               Sign in with Slack
             </Button>
 
-            {process.env.NODE_ENV === "meow" && <ImpersonateBtn />}
+            {process.env.NODE_ENV === "development" && <ImpersonateBtn />}
           </div>
 
           <div className="text-sm text-muted-foreground">

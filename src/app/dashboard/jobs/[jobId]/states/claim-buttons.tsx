@@ -55,8 +55,8 @@ export function ClaimButton({ jobId, onSuccess, onError }: StateButtonProps) {
         <AlertDialogHeader>
           <AlertDialogTitle>Claim this print job?</AlertDialogTitle>
           <AlertDialogDescription>
-            By claiming this job, you're committing to print these parts. Make
-            sure you have the right materials and time available.
+            By claiming this job, you&apos;re committing to print these parts.
+            Make sure you have the right materials and time available.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

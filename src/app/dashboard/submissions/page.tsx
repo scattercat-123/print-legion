@@ -1,5 +1,4 @@
 import { JobCard } from "@/components/job-card";
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { searchJobs } from "@/lib/airtable";
 import { redirect } from "next/navigation";

@@ -71,8 +71,8 @@ export function StartPrintingButton({
         <AlertDialogHeader>
           <AlertDialogTitle>Start printing this job?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will mark the job as "In Progress". Make sure you have all the
-            necessary materials ready.
+            This will mark the job as &quot;In Progress&quot;. Make sure you
+            have all the necessary materials ready.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

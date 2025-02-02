@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
-import type { FilamentUsage, FulfillmentPhoto } from "./types";
+import type { FilamentUsage } from "./types";
 import type { JobStatusType } from "@/lib/types";
 
 export async function startPrinting(jobId: string) {

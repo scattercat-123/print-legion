@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getById } from "@/lib/airtable";
 import { auth } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import type { User } from "@/lib/types";

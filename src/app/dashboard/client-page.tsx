@@ -2,8 +2,6 @@
 
 import { JobCard } from "@/components/job-card";
 import Link from "next/link";
-import { PlusIcon, PrinterIcon, InboxIcon, SearchIcon } from "lucide-react";
-import { useMemo } from "react";
 import { Session } from "next-auth";
 import { getRecentActivity } from "./recent-activity.action";
 import { NavItem } from "./layout";
@@ -49,7 +47,7 @@ export default function DashboardPage({
             Welcome back, {session?.user?.name?.split(" ")[0]}!
           </h1>
           <p className="text-purple-100 z-10">
-            Here's what's happening in your printing world
+            Here&apos;s what&apos;s happening in your printing world
           </p>
         </div>
       </div>

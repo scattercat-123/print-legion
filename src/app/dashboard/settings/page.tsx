@@ -5,11 +5,7 @@ import SettingsPage from "./client-page";
 import { cache } from "react";
 
 const cached_getById = cache(getById);
-export default async function SettingsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function SettingsLayout() {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/");

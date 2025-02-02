@@ -4,7 +4,7 @@ import { getById } from "@/lib/airtable";
 
 export async function GET(
   request: Request,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     const session = await auth();
@@ -12,7 +12,7 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const job = await getById("job", params.jobId);
+    const job = await getById("job", (await params).jobId);
     if (!job) {
       return new NextResponse("Job not found", { status: 404 });
     }

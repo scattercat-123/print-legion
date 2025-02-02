@@ -45,7 +45,7 @@ export async function getById<T extends "job" | "user">(
       console.error("Failed to parse record:", parsed.error);
       return null;
     }
-    let final = { ...parsed.data, id: record.id };
+    const final = { ...parsed.data, id: record.id };
 
     if (type === "job") {
       const coords = record.fields["(auto)(creator)region_coordinates"];

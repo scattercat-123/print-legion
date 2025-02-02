@@ -17,32 +17,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     ...(process.env.NODE_ENV === "development"
       ? [
-        Credentials({
-          name: "Credentials",
-          credentials: {
-            impersonateId: { label: "Slack ID", type: "text" },
-          },
-          async authorize(credentials, request) {
-            const id = credentials.impersonateId;
-            if (!id) return null;
+          Credentials({
+            name: "Credentials",
+            credentials: {
+              impersonateId: { label: "Slack ID", type: "text" },
+            },
+            async authorize(credentials) {
+              const id = credentials.impersonateId;
+              if (!id) return null;
 
-            const user = await getSlackUserInfo(id as string);
-            if (!user) return null;
-            return {
-              id: user.id,
-              team_id: user.team_id,
-              impersonateId: user.id,
-              name: user.real_name,
-              image: user.profile.image_original,
-            };
-          },
-        }),
-      ]
+              const user = await getSlackUserInfo(id as string);
+              if (!user) return null;
+              return {
+                id: user.id,
+                team_id: user.team_id,
+                impersonateId: user.id,
+                name: user.real_name,
+                image: user.profile.image_original,
+              };
+            },
+          }),
+        ]
       : []),
   ],
   callbacks: {
-    async jwt({ token, profile, session }) {
-
+    async jwt({ token, profile }) {
       if (profile) {
         token.id = profile["https://slack.com/user_id"];
         token.team_id = profile["https://slack.com/team_id"];
@@ -56,7 +55,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
 
-    async session({ session, user, token }) {
+    async session({ session, token }) {
       session.user.id = token.id as string;
       return session;
     },

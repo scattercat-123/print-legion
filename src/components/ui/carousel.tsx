@@ -253,13 +253,12 @@ const CarouselNext = React.forwardRef<
 CarouselNext.displayName = "CarouselNext";
 
 const CarouselButton = ({
-  children,
   mode,
   className,
   ...props
 }: React.ComponentProps<typeof Button> & { mode: "prev" | "next" }) => {
   "use client";
-  const { orientation, scrollPrev, canScrollPrev, scrollNext, canScrollNext } =
+  const { scrollPrev, canScrollPrev, scrollNext, canScrollNext } =
     useCarousel();
 
   return (

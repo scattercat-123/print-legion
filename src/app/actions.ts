@@ -1,31 +1,10 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import Airtable from "airtable";
 import { createRecord, getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import type { User, JobStatusType } from "@/lib/types";
-import { geocodeSearch, type GeocodingResult } from "@/lib/geo";
-
-// Initialize Airtable base
-const airtable = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY,
-});
-const base = airtable.base(process.env.AIRTABLE_BASE_ID!);
-
-// Define a type for Airtable attachments
-interface AirtableAttachment {
-  id: string;
-  url: string;
-  filename: string;
-  size: number;
-  type: string;
-}
-
-interface UpdateUserData {
-  onboarded?: boolean;
-  printer_has?: boolean;
-}
+import { geocodeSearch } from "@/lib/geo";
 
 export async function claimJob(jobId: string) {
   const session = await auth();
@@ -220,8 +199,8 @@ export async function updateUserSettings(formData: FormData) {
 
 export async function searchLocations(query: string) {
   const results = await geocodeSearch(query);
-  let seen: Set<string> = new Set();
-  let seen_coords: Set<string> = new Set();
+  const seen: Set<string> = new Set();
+  const seen_coords: Set<string> = new Set();
   return results.reduce((acc, result) => {
     if (seen.has(result.display_name)) {
       return acc;

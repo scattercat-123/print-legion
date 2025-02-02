@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { cn } from "@/lib/utils";
 import {
   Briefcase,
   Search,
@@ -100,14 +98,11 @@ export default async function DashboardLayout({
         <div className="flex min-h-screen bg-black w-full" data-theme="dark">
           <DashboardSidebar navItems={navItems} />
           <main className="flex-1 rounded-xl bg-black w-full">
-            
             <div className="flex items-center border-b p-1 h-[2.55rem]">
               <SidebarTrigger />
               {/* todo: figure out what to put here in the future lol but calm for now */}
             </div>
-            <div className="p-3 sm:p-6">
-              {children}
-            </div>
+            <div className="p-3 sm:p-6">{children}</div>
           </main>
         </div>
       </SidebarProvider>

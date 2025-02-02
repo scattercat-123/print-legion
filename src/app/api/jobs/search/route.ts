@@ -71,7 +71,7 @@ export async function GET(request: Request) {
 
     const coordinates = searchParams.get("coordinates");
     jobs = jobs.map((job) => {
-      let job_coords = job["(auto)(creator)region_coordinates"];
+      const job_coords = job["(auto)(creator)region_coordinates"];
       if (coordinates && job_coords && job_coords.length >= 1) {
         Object.assign(job, {
           distance: getDistance(coordinates, job_coords[0]),

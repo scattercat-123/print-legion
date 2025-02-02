@@ -10,15 +10,10 @@ import { STATUS_AESTHETIC } from "@/lib/consts";
 
 interface JobCardProps {
   job: Job & { id: string; distance?: number };
-  isAssigned?: boolean;
   className?: string;
 }
 
-function JobCardComponent({
-  job,
-  isAssigned = false,
-  className,
-}: JobCardProps) {
+function JobCardComponent({ job, className }: JobCardProps) {
   const router = useRouter();
 
   const thumbnailUrl = useMemo(() => {

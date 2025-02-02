@@ -14,7 +14,7 @@ import YSWS_Selector, {
   YSWS_SelectorProvider,
 } from "@/hooks/use-ysws-search";
 import { AutoComplete } from "@/components/ui/autocomplete";
-import { useMemo, useState as useStateForLocation } from "react";
+import { useMemo } from "react";
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (
@@ -163,9 +163,9 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
             </label>
             <YSWS_Selector />
             <p className="mt-1 text-xs text-zinc-400">
-              Pick the you-ship-we-ships you'd like to see more of. You still
-              see prints from all of them, but these will be prioritized in
-              search.{" "}
+              Pick the you-ship-we-ships you&apos;d like to see more of. You
+              still see prints from all of them, but these will be prioritized
+              in search.{" "}
               {selectedLength === serverYSWSOptions.length && (
                 <span className="text-red-500">
                   (Well done! Selecting them all is like... selecting none.)
@@ -203,8 +203,8 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
                   defaultValue={settingsData.printer_type}
                 />
                 <p className="mt-1 text-xs text-zinc-400">
-                  Describe your printer model (e.g. "Bambu A1 Mini", "Prusa i3
-                  MK3S+")
+                  Describe your printer model (e.g. &quot;Bambu A1 Mini&quot;,
+                  &quot;Prusa i3 MK3S+&quot;)
                 </p>
               </div>
 

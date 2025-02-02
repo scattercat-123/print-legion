@@ -32,7 +32,12 @@ const PRINTER_BRANDS = [
 ] as const;
 
 interface StepProps {
-  onNext: (data?: any) => void;
+  onNext: (
+    data?:
+      | "printer"
+      | "requestor"
+      | { printerBrand: string; buildVolume: string }
+  ) => void;
   onBack?: () => void;
   loading?: boolean;
 }
@@ -189,7 +194,7 @@ const PrinterConfigStep = ({ onNext, onBack }: StepProps) => {
             <p className="text-yellow-400 mt-2">
               Enter build volume (format: WxHxD, e.g. 220x220x250):
             </p>
-            <p className="text-gray-400">Or type 'back' to return</p>
+            <p className="text-gray-400">Or type &quot;back&quot; to return</p>
             <CommandInput
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -259,7 +264,7 @@ const FinalStep = ({ onNext, loading }: StepProps) => {
     <div className="terminal-output">
       <p className="text-green-400">🎉 Setup Complete!</p>
       <p className="text-gray-400 mt-2">
-        You're all set to start using Launchpad.
+        You&apos;re all set to start using Launchpad.
       </p>
       {loading ? (
         <p className="text-yellow-400 mt-4">Processing...</p>
@@ -303,8 +308,13 @@ export function OnboardingDialog({
     build_volume?: string;
   }>({});
 
-  const handleNext = async (stepData?: any) => {
-    if (step === 2) {
+  const handleNext = async (
+    stepData?:
+      | "printer"
+      | "requestor"
+      | { printerBrand: string; buildVolume: string }
+  ) => {
+    if (step === 2 && typeof stepData === "string") {
       console.log("Setting user type:", stepData);
       data.current.user_type = stepData;
       if (stepData === "printer") {
@@ -313,7 +323,7 @@ export function OnboardingDialog({
         setStep(4);
       }
       return;
-    } else if (step === 3) {
+    } else if (step === 3 && typeof stepData === "object") {
       data.current.printer_brand = stepData.printerBrand;
       data.current.build_volume = stepData.buildVolume;
     } else if (step === 4) {
@@ -342,20 +352,6 @@ export function OnboardingDialog({
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    const titleBar = e.currentTarget;
-    if (titleBar === e.target) {
-      setIsDragging(true);
-      const rect = dialogRef.current?.getBoundingClientRect();
-      if (rect) {
-        dragStartPos.current = {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        };
-      }
     }
   };
 

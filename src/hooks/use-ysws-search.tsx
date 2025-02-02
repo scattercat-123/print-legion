@@ -17,7 +17,7 @@ import {
   type MultipleSelectorRef,
   type Option,
 } from "@/components/ui/multiple-selector";
-import type { User, YSWSIndex } from "@/lib/types";
+import type { YSWSIndex } from "@/lib/types";
 import useSWRImmutable from "swr/immutable";
 import { getAll_YSWS } from "@/lib/airtable/ysws_index";
 import createFuzzySearch from "@nozbe/microfuzz";
@@ -25,7 +25,7 @@ import createFuzzySearch from "@nozbe/microfuzz";
 type YSWSContextType = {
   serverYSWSOptions: Option[];
   isLoading: boolean;
-  error: any;
+  error: unknown;
   fuzzySearch: (query: string) => Option[];
   fixedSelectedOptions: Option[];
   yswsData: (YSWSIndex & { id: string })[] | undefined;
@@ -122,7 +122,6 @@ export default function YSWS_Selector({
 }) {
   const {
     serverYSWSOptions,
-    isLoading,
     fuzzySearch,
     fixedSelectedOptions,
     ref,

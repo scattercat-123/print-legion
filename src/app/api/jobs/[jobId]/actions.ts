@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { getById, updateBySlackId } from "@/lib/airtable";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { User, JobStatusType } from "@/lib/types";
+import type { JobStatusType } from "@/lib/types";
 
 export async function claimJob(jobId: string) {
   const session = await auth();

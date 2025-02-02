@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { CheckIcon, ImageIcon, UploadIcon } from "lucide-react";
+import { CheckIcon, UploadIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
