@@ -14,11 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { markFulfilled, confirmFulfillment } from "./actions";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import type { StateButtonProps } from "./types";
 import { cn } from "@/lib/utils";
+import { updateJobStatus } from "@/lib/actions/jobs/job-status.action";
 
 export function MarkFulfilledButton({
   jobId,
@@ -54,7 +55,10 @@ export function MarkFulfilledButton({
 
     try {
       setIsLoading(true);
-      await markFulfilled(jobId, description);
+      await updateJobStatus(jobId, {
+        status: "fulfilled_awaiting_confirmation",
+        fulfilment_notes: description,
+      });
 
       const uploadFormData = new FormData();
       uploadFormData.append("file", selectedFile);
@@ -182,7 +186,9 @@ export function ConfirmFulfillmentButton({
   const handleConfirm = async () => {
     try {
       setIsLoading(true);
-      await confirmFulfillment(jobId);
+      await updateJobStatus(jobId, {
+        status: "finished",
+      });
       toast.success("Fulfillment confirmed", {
         description: "Thank you for confirming receipt of your print!",
       });

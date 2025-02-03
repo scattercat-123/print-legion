@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { updateUserSettings, searchLocations } from "@/app/actions";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { User, YSWSIndex } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +14,8 @@ import YSWS_Selector, {
 } from "@/hooks/use-ysws-search";
 import { AutoComplete } from "@/components/ui/autocomplete";
 import { useMemo } from "react";
+import { searchLocations } from "@/lib/actions/location-search.action";
+import { updateUserSettings } from "@/lib/actions/update-user-settings.action";
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (

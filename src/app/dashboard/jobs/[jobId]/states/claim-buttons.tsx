@@ -13,10 +13,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { claimJob, unclaimJob } from "./actions";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { StateButtonProps } from "./types";
+import { claimJob } from "@/lib/actions/jobs/claim-job.action";
+import { unclaimJob } from "@/lib/actions/jobs/unclaim-job.action";
 
 export function ClaimButton({ jobId, onSuccess, onError }: StateButtonProps) {
   const [isLoading, setIsLoading] = useState(false);

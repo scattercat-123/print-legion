@@ -9,17 +9,6 @@ export interface GeocodingResult {
   display_name: string;
 }
 
-export const locationKey = (
-  location: string | { lat: string; lon: string },
-  base?: string
-) => {
-  const dp_2 = (num: number) => Math.round(num * 100) / 100;
-
-  return typeof location === "string"
-    ? `${base}-${location}`
-    : `${base}-${dp_2(Number(location.lat))}-${dp_2(Number(location.lon))}`;
-};
-
 export async function geocodeSearch(query: string) {
   const response = await fetch(
     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(

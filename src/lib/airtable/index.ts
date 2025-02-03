@@ -10,7 +10,6 @@ const init = () => {
     throw new Error("Missing AIRTABLE_BASE_ID");
   }
 
-  // Initialize Airtable
   const airtable = new Airtable({
     apiKey: process.env.AIRTABLE_API_KEY,
   });

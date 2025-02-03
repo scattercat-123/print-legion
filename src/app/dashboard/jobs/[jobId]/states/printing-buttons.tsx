@@ -31,12 +31,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { startPrinting, completePrinting } from "./actions";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { StateButtonProps } from "./types";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { updateJobStatus } from "@/lib/actions/jobs/job-status.action";
 
 export function StartPrintingButton({
   jobId,
@@ -48,7 +48,9 @@ export function StartPrintingButton({
   const handleStart = async () => {
     try {
       setIsLoading(true);
-      await startPrinting(jobId);
+      await updateJobStatus(jobId, {
+        status: "printing_in_progress",
+      });
       toast.success("Print started", {
         description: "Good luck with the print!",
       });
@@ -170,7 +172,11 @@ export function CompletePrintingButton({
         }
       }
 
-      await completePrinting(jobId, { grams, notes });
+      await updateJobStatus(jobId, {
+        status: "completed_printing",
+        filament_used: grams,
+        printing_notes: notes,
+      });
 
       toast.success("Print completed", {
         description: "Great job! You can now proceed with fulfillment.",

@@ -11,7 +11,7 @@ import { getById } from "@/lib/airtable";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import type { User } from "@/lib/types";
-import { OnboardingWrapper } from "./onboarding";
+import { OnboardingProvider } from "@/components/onboarding-provider";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -93,7 +93,7 @@ export default async function DashboardLayout({
   }
   const navItems = computeNavItems(user);
   return (
-    <OnboardingWrapper user={user}>
+    <OnboardingProvider user={user}>
       <SidebarProvider defaultOpen>
         <div className="flex min-h-screen bg-black w-full" data-theme="dark">
           <DashboardSidebar navItems={navItems} />
@@ -106,6 +106,6 @@ export default async function DashboardLayout({
           </main>
         </div>
       </SidebarProvider>
-    </OnboardingWrapper>
+    </OnboardingProvider>
   );
 }

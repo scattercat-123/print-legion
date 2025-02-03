@@ -9,6 +9,7 @@ import { MessageCircleQuestion, Search, TriangleAlert } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { User } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Notice } from "@/components/notice";
 
 export default function SearchPage({ user }: { user: User }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,39 +50,31 @@ export default function SearchPage({ user }: { user: User }) {
           <Skeleton className="w-full h-[10.75rem] rounded-xl" />
         </div>
       ) : error ? (
-        <div className="flex justify-center flex-col text-red-400">
-          <h3 className="text-lg font-semibold flex tracking-tight items-center gap-2">
-            <TriangleAlert className="w-5 h-5" />
-            Error
-          </h3>
-          <span className="text-sm">{(error as Error).message}</span>
-        </div>
+        <Notice variant="error" title="Error" icon={TriangleAlert}>
+          {(error as Error).message}
+        </Notice>
       ) : jobs.length === 0 ? (
-        <div className="flex justify-center flex-col text-muted-foreground">
-          <h3 className="text-lg font-semibold flex tracking-tight items-center gap-2">
-            <MessageCircleQuestion className="w-5 h-5" />
-            No results
-          </h3>
-          <span className="text-sm">
-            {debouncedQuery.length > 0 ? (
-              "Seems like we couldn&apos;t find any results for your search - try a different search term?"
-            ) : (
-              <span>
-                Seems like we couldn&apos;t find any jobs in your area - maybe
-                ask around in{" "}
-                <a
-                  href="https://hackclub.slack.com/archives/C083P4FJM46"
-                  target="_blank"
-                  className="underline hover:text-primary transition-colors"
-
-                >
-                  #printing-legion
-                </a>
-                ?
-              </span>
-            )}
-          </span>
-        </div>
+        <Notice
+          variant="default"
+          title="No results"
+          icon={MessageCircleQuestion}
+        >
+          {debouncedQuery.length > 0 ? (
+            "Seems like we couldn&apos;t find any results for your search - try a different search term?"
+          ) : (
+            <span>
+              Seems like we couldn&apos;t find any jobs in your area - maybe ask
+              around in{" "}
+              <a
+                href="https://hackclub.slack.com/archives/C083P4FJM46"
+                target="_blank"
+              >
+                #printing-legion
+              </a>
+              ?
+            </span>
+          )}
+        </Notice>
       ) : (
         <>
           <div className="grid gap-2">

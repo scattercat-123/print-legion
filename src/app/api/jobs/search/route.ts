@@ -66,11 +66,6 @@ export async function GET(request: Request) {
       maxRecords: 10,
     });
 
-    // // Filter to only show jobs that need printing
-    // const availableJobs = jobs.filter(
-    //   (job) =>
-    //     !job["(auto)(assigned_printer)slack_id"] && job.need_printed_parts
-    // );
     if (user.preferred_ysws?.length) {
       jobs = jobs.sort((a, b) => {
         const a_ysws = a.ysws?.[0];

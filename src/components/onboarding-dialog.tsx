@@ -8,7 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
-import { updateUserSettings, searchLocations } from "@/app/actions";
+import { searchLocations } from "@/lib/actions/location-search.action";
+import { updateUserSettings } from "@/lib/actions/update-user-settings.action";
 
 interface OnboardingDialogProps {
   open: boolean;
@@ -72,6 +73,7 @@ const CommandInput = ({
     <div ref={wrapperRef} className="flex items-center terminal-input-wrapper">
       <span className="text-gray-400 mr-2">$</span>
       <div className="relative flex-1">
+        {/* biome-ignore lint/nursery/noStaticElementInteractions: what? */}
         <input
           ref={inputRef}
           autoFocus

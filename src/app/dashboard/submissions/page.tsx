@@ -3,6 +3,9 @@ import { auth } from "@/lib/auth";
 import { searchJobs } from "@/lib/airtable";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import { Notice } from "@/components/notice";
+import { MessageCircleQuestion } from "lucide-react";
+import Link from "next/link";
 
 const cached_searchJobs = cache(searchJobs);
 export default async function SubmissionsPage() {
@@ -17,9 +20,17 @@ export default async function SubmissionsPage() {
 
   if (jobs.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-zinc-400">No submissions found</p>
-      </div>
+      <Notice variant="default" title="No results" icon={MessageCircleQuestion}>
+        Seems like we couldn&apos;t find any submissions on your account. Maybe
+        it's time to{" "}
+        <Link
+          href="/dashboard/jobs/create"
+          className="underline hover:text-primary transition-colors"
+        >
+          create a new job
+        </Link>
+        ?
+      </Notice>
     );
   }
 

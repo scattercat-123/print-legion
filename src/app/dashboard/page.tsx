@@ -1,7 +1,7 @@
 import DashboardPage from "./client-page";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getRecentActivity } from "./recent-activity.action";
+import { getRecentActivity } from "../../lib/actions/recent-activity.action";
 import { cache } from "react";
 import { User } from "@/lib/types";
 import { cached_getById, computeNavItems } from "./layout";

@@ -3,7 +3,7 @@
 import { JobCard } from "@/components/job-card";
 import Link from "next/link";
 import { Session } from "next-auth";
-import { getRecentActivity } from "./recent-activity.action";
+import { getRecentActivity } from "../../lib/actions/recent-activity.action";
 import { NavItem } from "./layout";
 
 const StatsCard = ({

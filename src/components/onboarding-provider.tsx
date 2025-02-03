@@ -4,7 +4,7 @@ import { useState } from "react";
 import { OnboardingDialog } from "@/components/onboarding-dialog";
 import { User } from "@/lib/types";
 
-export function OnboardingWrapper({
+export function OnboardingProvider({
   children,
   user,
 }: {

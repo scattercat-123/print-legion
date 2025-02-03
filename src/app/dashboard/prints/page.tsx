@@ -2,6 +2,9 @@ import { JobCard } from "@/components/job-card";
 import { auth } from "@/lib/auth";
 import { searchJobs } from "@/lib/airtable";
 import { redirect } from "next/navigation";
+import { Notice } from "@/components/notice";
+import { MessageCircleQuestion } from "lucide-react";
+import Link from "next/link";
 
 export default async function PrintsPage() {
   const session = await auth();
@@ -15,9 +18,17 @@ export default async function PrintsPage() {
 
   if (jobs.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-zinc-400">No prints found</p>
-      </div>
+      <Notice variant="default" title="No results" icon={MessageCircleQuestion}>
+        Seems like we couldn&apos;t find any prints on your account. Maybe it's
+        time to{" "}
+        <Link
+          href="/dashboard/jobs/search"
+          className="underline hover:text-primary transition-colors"
+        >
+          find something to print
+        </Link>
+        ?
+      </Notice>
     );
   }
 

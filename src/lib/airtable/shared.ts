@@ -3,20 +3,32 @@ import { usersTable, jobsTable } from ".";
 import { JobSchema, UserSchema, type Job, type User } from "../types";
 import { getDistance } from "../distance";
 
+type GetByIdReturn<T extends "job" | "user", R extends boolean> = R extends true
+  ? (T extends "job" ? Job : User) & { id: string; distance?: number }
+  : ((T extends "job" ? Job : User) & { id: string; distance?: number }) | null;
+
 // Helper functions
-export async function getById<T extends "job" | "user">(
+export async function getById<T extends "job" | "user", R extends boolean>(
   type: T,
-  id: string,
+  id: string | undefined,
   {
     includeSensitiveFields = false,
     coordinatesForDistance,
+    throwOnNotFound = false as R,
   }: {
     includeSensitiveFields?: boolean;
     coordinatesForDistance?: string;
+    throwOnNotFound?: R;
   } = {}
-): Promise<
-  ((T extends "job" ? Job : User) & { id: string; distance?: number }) | null
-> {
+): Promise<GetByIdReturn<T, R>> {
+  if (!id) {
+    if (throwOnNotFound) {
+      console.error(`[getById.error] ${type} not found: ${id}`);
+      throw new Error(`not found`);
+    }
+    return null as GetByIdReturn<T, R>;
+  }
+
   console.log(`[getById] ${type} ${id}`);
   try {
     let record: Record<FieldSet>;
@@ -43,7 +55,7 @@ export async function getById<T extends "job" | "user">(
     );
     if (!parsed.success) {
       console.error("Failed to parse record:", parsed.error);
-      return null;
+      return null as GetByIdReturn<T, R>;
     }
     const final = { ...parsed.data, id: record.id };
 
@@ -74,7 +86,10 @@ export async function getById<T extends "job" | "user">(
     };
   } catch (error) {
     console.error("Error fetching record:", error);
-    return null;
+    if (throwOnNotFound) {
+      throw new Error(`${type} error fetching record: ${id} - ${error}`);
+    }
+    return null as GetByIdReturn<T, R>;
   }
 }
 

@@ -1,3 +1,5 @@
+"use server";
+import "server-only";
 import { jobsTable } from "@/lib/airtable";
 import { auth } from "@/lib/auth";
 import { Job, JobSchema } from "@/lib/types";
