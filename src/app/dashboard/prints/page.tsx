@@ -12,7 +12,7 @@ export default async function PrintsPage() {
     redirect("/");
   }
 
-  const jobs = await searchJobs({
+  const { data: jobs, offset: next_offset } = await searchJobs({
     formula: `{(auto)(assigned_printer)slack_id} = '${session.user.id}'`,
   });
 

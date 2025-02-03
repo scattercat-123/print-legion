@@ -14,7 +14,7 @@ export default async function SubmissionsPage() {
     redirect("/");
   }
 
-  const jobs = await cached_searchJobs({
+  const { data: jobs, offset: next_offset } = await cached_searchJobs({
     formula: `{(auto)(creator)slack_id} = '${session.user.id}'`,
   });
 

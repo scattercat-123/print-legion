@@ -108,7 +108,6 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
 
     try {
       const formData = new FormData(e.currentTarget);
-      console.log(Object.fromEntries(formData.entries()));
       // Get selected YSWS from the ref
       const selectedOptions = yswsSelectorRef.current?.selectedValue ?? [];
       formData.set(

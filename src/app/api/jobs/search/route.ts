@@ -19,9 +19,8 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
+    const offset = searchParams.get("offset");
     const coordinates = searchParams.get("coordinates");
-
-    const page = Number.parseInt(searchParams.get("page") || "0", 10);
 
     const q = query.toLowerCase().trim();
 
@@ -64,10 +63,10 @@ export async function GET(request: Request) {
       )`.trim();
     }
 
-    let jobs = await searchJobs({
+    let { data: jobs, offset: next_offset } = await searchJobs({
       formula: with_location_formula,
-      offset: page,
-      maxRecords: 10,
+      offset: offset ?? undefined,
+      pageSize: 10,
     });
 
     // first sort by distance
@@ -102,7 +101,7 @@ export async function GET(request: Request) {
       });
     }
 
-    return NextResponse.json(jobs);
+    return NextResponse.json({ jobs, next_offset });
   } catch (error) {
     console.error("Error searching jobs:", error);
     return NextResponse.json({ code: 500, message: "Internal Server Error" }, { status: 500 });

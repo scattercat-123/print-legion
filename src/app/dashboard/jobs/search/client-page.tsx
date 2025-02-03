@@ -20,7 +20,6 @@ export default function SearchPage({ user }: { user: User }) {
     user?.region_coordinates
   );
 
-  console.log(jobs);
   const loadMore = useCallback(() => {
     setSize(size + 1);
   }, [setSize, size]);
