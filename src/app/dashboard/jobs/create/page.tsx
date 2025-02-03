@@ -235,9 +235,9 @@ function PureCreateJobPage() {
       return false;
     }
 
-    if (!itemDescription?.trim() || itemDescription.split(/\s+/).length < 50) {
+    if (!itemDescription?.trim() || itemDescription.split(/\s+/).length < 25) {
       toast.error("Description too short", {
-        description: "Please provide a description with at least 50 words",
+        description: "Please provide a description with at least 25 words",
       });
       return false;
     }
