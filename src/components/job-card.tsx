@@ -84,10 +84,12 @@ function JobCardComponent({ job, className }: JobCardProps) {
                 </Badge>
               )}
 
-              {job.distance !== undefined && job.distance > 0.0 && (
-                <Badge variant="secondary-static" className="text-xs pl-1.5">
-                  <MapPin className="size-[0.875rem] shrink-0 mr-0.5" />~
-                  {job.distance.toFixed(1)} km
+              {job.distance !== undefined && (
+                <Badge variant="secondary-static" className="text-xs px-1.5">
+                  <MapPin className="size-[0.875rem] shrink-0 mr-1" />
+                  {job.distance === 0.0
+                    ? "Nearby"
+                    : `~${job.distance.toFixed(1)} km`}
                 </Badge>
               )}
             </div>
