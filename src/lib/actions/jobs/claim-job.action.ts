@@ -39,8 +39,8 @@ export async function claimJob(jobId: string) {
     }
 
     const distance = getDistance(loc_submitter[0], loc_claimer);
-    if (distance < max_meetup_distance_km) {
-      throw new Error("You are too far away from the job location to claim it");
+    if (distance > max_meetup_distance_km) {
+      throw new Error(`You are further than ${max_meetup_distance_km}km from the job location!`);
     }
 
     const success = await updateBySlackId("job", jobId, {
