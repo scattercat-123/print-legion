@@ -16,8 +16,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { PrinterIcon } from "lucide-react";
+import { LogOutIcon, PrinterIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "next-auth/react";
 interface DashboardSidebarProps {
   navItems: NavItem[];
 }
@@ -72,7 +73,7 @@ export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="border-t">
-        <SidebarMenu>
+        <SidebarMenu className="gap-1">
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -83,6 +84,14 @@ export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
                 {navItems[navItems.length - 1].icon}
                 <span>{navItems[navItems.length - 1].title}</span>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip={"Logout"}>
+              <button type="button" onClick={() => signOut()}>
+                <LogOutIcon className="w-5 h-5 shrink-0" />
+                <span>Logout</span>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
