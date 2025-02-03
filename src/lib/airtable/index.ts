@@ -22,7 +22,7 @@ const cached_init = cache(init);
 const { base, airtable } = cached_init();
 
 // Table references
-export const jobsTable = base("Form");
+export const jobsTable = base(process.env.AIRTABLE_JOBS_TABLE_NAME ?? "Form");
 export const usersTable = base("Users");
 export const yswsIndexTable = base("YSWS Index");
 
