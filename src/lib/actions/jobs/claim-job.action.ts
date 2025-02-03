@@ -38,7 +38,7 @@ export async function claimJob(jobId: string) {
       throw new Error("Either the job creator or the user has not set their location");
     }
 
-    const distance = getDistance(loc_submitter[0], loc_claimer);
+    const distance = getDistance(loc_submitter, loc_claimer);
     if (distance > max_meetup_distance_km) {
       throw new Error(`You are further than ${max_meetup_distance_km}km from the job location!`);
     }
