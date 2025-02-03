@@ -3,7 +3,7 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { getById, createRecord, updateBySlackId } from "../airtable";
 import { auth } from "../auth";
-import type { User } from "../types";
+import { DistanceSchema, type User } from "../types";
 
 export async function updateUserSettings(formData: FormData) {
   const session = await auth();
@@ -18,6 +18,8 @@ export async function updateUserSettings(formData: FormData) {
   const region_complete_name = formData.get("region_complete_name")?.toString();
   const user = await getById("user", session.user.id);
   const onboarded = formData.get("onboarded") ? formData.get("onboarded") === "on" : undefined;
+  const preferred_distance = formData.get("preferred_distance")?.toString();
+  const preferred_distance_value = DistanceSchema.safeParse(preferred_distance);
 
   const obj: User = {
     slack_id: session.user.id,
@@ -28,6 +30,7 @@ export async function updateUserSettings(formData: FormData) {
     onboarded,
     region_coordinates,
     region_complete_name,
+    preferred_distance: preferred_distance_value.success ? preferred_distance_value.data : undefined,
   };
 
   if (!user) {

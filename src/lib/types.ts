@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const DistanceSchema = z.enum([
+  "5km_city",
+  "10km_neighbourhood",
+  "25km_nearby_town",
+  "50km_day_trip",
+  "400km_cross_state",
+  "infinitekm_global",
+]);
+
 export const JobStatus = z.enum([
   "needs_printer", // Initial state after submission
   "claimed", // Printer has claimed but not started
@@ -84,6 +93,8 @@ export const UserSchema = z.object({
   // lat,lon e.g "40.7128,-74.0060"
   region_coordinates: z.string().optional(),
   region_complete_name: z.string().optional(),
+
+  preferred_distance: DistanceSchema.default("10km_neighbourhood").optional(),
 });
 
 export const YSWSIndexSchema = z.object({

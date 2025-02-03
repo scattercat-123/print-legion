@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { User, YSWSIndex } from "@/lib/types";
+import type { DistanceSchema, User, YSWSIndex } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import YSWS_Selector, {
@@ -16,6 +16,17 @@ import { AutoComplete } from "@/components/ui/autocomplete";
 import { useMemo } from "react";
 import { searchLocations } from "@/lib/actions/location-search.action";
 import { updateUserSettings } from "@/lib/actions/update-user-settings.action";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { InfinityIcon } from "lucide-react";
+import { z } from "zod";
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (
@@ -56,6 +67,10 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
           label: settingsData.region_complete_name || "",
         }
       : undefined
+  );
+
+  const [preferredDistance, setPreferredDistance] = useState(
+    settingsData.preferred_distance
   );
   const {
     selectedLength,
@@ -103,6 +118,9 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
       if (selectedLocation) {
         formData.set("region_coordinates", selectedLocation.value);
         formData.set("region_complete_name", selectedLocation.label);
+      }
+      if (preferredDistance) {
+        formData.set("preferred_distance", preferredDistance);
       }
 
       await updateUserSettings(formData);
@@ -152,6 +170,78 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
               Enter your location to help us match you with nearby prints.
               Please <b>do not add your exact address</b>, but rather a general
               area.
+            </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="region_complete_name"
+              className="block text-sm font-medium mb-2"
+            >
+              {hasPrinter ? "Travel Distance" : "Viewing Distance"}
+            </label>
+            <Select
+              value={preferredDistance}
+              onValueChange={(value) => {
+                setPreferredDistance(value as z.infer<typeof DistanceSchema>);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a distance" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="5km_city">
+                    <span className="flex items-center gap-2">
+                      5 km <span className="text-xs text-zinc-400">City</span>
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="10km_neighbourhood">
+                    10 km{" "}
+                    <span className="text-xs text-zinc-400">Neighbourhood</span>
+                  </SelectItem>
+                  <SelectItem value="25km_nearby_town">
+                    25 km{" "}
+                    <span className="text-xs text-zinc-400">Nearby Town</span>
+                  </SelectItem>
+                  <SelectItem value="50km_day_trip">
+                    50 km{" "}
+                    <span className="text-xs text-zinc-400">Day Trip</span>
+                  </SelectItem>
+                  <SelectItem value="400km_cross_state">
+                    400 km{" "}
+                    <span className="text-xs text-zinc-400">Cross State</span>
+                  </SelectItem>
+                  <SelectItem value="infinitekm_global">
+                    <span className="flex items-center gap-2">
+                      <InfinityIcon className="w-4 h-4" />
+                      km
+                      <span className="text-xs text-zinc-400">Global</span>
+                    </span>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-zinc-400">
+              {hasPrinter ? (
+                <>
+                  Pick how far you&apos;d be willing to travel to fulfil a
+                  print.{" "}
+                  {![
+                    "5km_city",
+                    "10km_neighbourhood",
+                    "25km_nearby_town",
+                  ].includes(preferredDistance ?? "") && (
+                    <span className="text-xs text-zinc-400 font-medium">
+                      Note: you will only be able to claim items within 25km of
+                      your location - your selected distance is for viewing
+                      purposes only.
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>Pick how far you&apos;d like to see prints from in search.</>
+              )}
             </p>
           </div>
 
