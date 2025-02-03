@@ -11,7 +11,7 @@ import {
 import { SlackUserInfo } from "@/lib/slack";
 import { AirtableAttachmentSchema, User } from "@/lib/types";
 import { DownloadIcon, MessageCircle, Printer } from "lucide-react";
-import { use } from "react";
+import { use, useMemo } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,7 +28,7 @@ const ImageCard = ({
   return (
     <CarouselItem
       key={image.id}
-      className="basis-full md:basis-1/2 lg:basis-1/3"
+      className="basis-full md:basis-1/2 lg:basis-1/3 max-w-sm"
     >
       <div className="relative aspect-square">
         <img
@@ -76,9 +76,15 @@ export const ImageCarousel = ({
   main_image_id?: string;
   fulfillment_photo?: z.infer<typeof AirtableAttachmentSchema>[];
 }) => {
+  const has_photo = useMemo(() => {
+    if (fulfillment_photo && fulfillment_photo.length > 0) return true;
+    if (user_images && user_images.length > 0) return true;
+
+    return false;
+  }, [fulfillment_photo, user_images]);
+
   return (
-    user_images &&
-    user_images.length > 0 && (
+    has_photo && (
       <div className="space-y-4">
         <h2 className="text-lg font-medium tracking-tight">Images</h2>
         <div className="relative">
@@ -98,7 +104,7 @@ export const ImageCarousel = ({
                   override_name="Fulfillment Photo"
                 />
               ))}
-              {user_images.map((image) => (
+              {user_images?.map((image) => (
                 <ImageCard
                   key={image.id}
                   image={image}

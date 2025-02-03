@@ -17,7 +17,7 @@ const UpdateCompletedPrinting = z.object({
 
 const UpdateFulfiled = z.object({
   status: z.literal("fulfilled_awaiting_confirmation"),
-  fulfilment_notes: z.string().optional(),
+  handoff_comments: z.string().optional(),
 });
 
 const UpdateConfirmFulfilment = z.object({

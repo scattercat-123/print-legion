@@ -276,6 +276,7 @@ export function CompletePrintingButton({
                 min="0"
                 step="0.1"
                 required
+                className="text-sm"
                 placeholder="Enter amount in grams"
               />
             </div>
@@ -285,7 +286,7 @@ export function CompletePrintingButton({
                 id="notes"
                 name="notes"
                 placeholder="Any additional notes about the print"
-                className="resize-none"
+                className="resize-none text-sm"
               />
             </div>
           </div>

@@ -57,7 +57,7 @@ export function MarkFulfilledButton({
       setIsLoading(true);
       await updateJobStatus(jobId, {
         status: "fulfilled_awaiting_confirmation",
-        fulfilment_notes: description,
+        handoff_comments: description,
       });
 
       const uploadFormData = new FormData();

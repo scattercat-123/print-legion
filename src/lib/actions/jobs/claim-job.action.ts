@@ -15,7 +15,10 @@ export async function claimJob(jobId: string) {
 
   const job = await getById("job", jobId, {
     throwOnNotFound: true,
+    includeSensitiveFields: true,
   });
+
+  console.log("job", job);
 
   if (job["(auto)(creator)slack_id"]?.[0] === user.slack_id) {
     throw new Error("You cannot claim your own job...");
@@ -25,7 +28,7 @@ export async function claimJob(jobId: string) {
     throw new Error("Job is not in a state where it can be claimed");
   }
 
-  if (job.assigned_printer?.length !== 0) {
+  if (job.assigned_printer && job.assigned_printer.length !== 0) {
     throw new Error("Job is already claimed");
   }
 
