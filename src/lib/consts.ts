@@ -29,4 +29,4 @@ export const STATUS_AESTHETIC = {
   },
 };
 
-export const max_meetup_distance_km = 6.5;
+export const max_meetup_distance_km = 25;
