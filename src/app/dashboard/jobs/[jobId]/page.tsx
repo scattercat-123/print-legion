@@ -18,7 +18,7 @@ import { JobStateButtons } from "./states/job-state-buttons";
 import { STATUS_AESTHETIC } from "@/lib/consts";
 import { cached_getById } from "../../layout";
 import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
-import { lazy, useMemo } from "react";
+import { lazy } from "react";
 
 const Markdown = lazy(() => import("@/components/markdown"));
 

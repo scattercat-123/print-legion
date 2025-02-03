@@ -64,15 +64,16 @@ export default function SearchPage({ user }: { user: User }) {
           </h3>
           <span className="text-sm">
             {debouncedQuery.length > 0 ? (
-              "Seems like we couldn't find any results for your search - try a different search term?"
+              "Seems like we couldn&apos;t find any results for your search - try a different search term?"
             ) : (
               <span>
-                Seems like we couldn't find any jobs in your area - maybe ask
-                around in{" "}
+                Seems like we couldn&apos;t find any jobs in your area - maybe
+                ask around in{" "}
                 <a
                   href="https://hackclub.slack.com/archives/C083P4FJM46"
                   target="_blank"
                   className="underline hover:text-primary transition-colors"
+
                 >
                   #printing-legion
                 </a>

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { SlackUserInfo } from "@/lib/slack";
 import { AirtableAttachmentSchema, User } from "@/lib/types";
-import { DownloadIcon, MessageCircle, Printer, MapPin } from "lucide-react";
+import { DownloadIcon, MessageCircle, Printer } from "lucide-react";
 import { use } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";

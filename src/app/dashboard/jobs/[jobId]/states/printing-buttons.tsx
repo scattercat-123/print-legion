@@ -239,7 +239,7 @@ export function CompletePrintingButton({
                   <div className="text-sm space-y-1">
                     <div className="font-medium">Selected files</div>
                     <div className="space-y-1">
-                      {selectedFiles.map((file, index) => (
+                      {selectedFiles.map((file) => (
                         <div
                           key={file.name}
                           className="flex items-center gap-2 bg-card border border-border rounded-md px-2 py-0.5"
