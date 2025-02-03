@@ -63,7 +63,7 @@ export async function GET(request: Request) {
       )`.trim();
     }
 
-    let { data: jobs, offset: next_offset } = await searchJobs({
+    let { data: jobs } = await searchJobs({
       formula: with_location_formula,
       offset: offset ?? undefined,
       pageSize: 10,
@@ -101,7 +101,7 @@ export async function GET(request: Request) {
       });
     }
 
-    return NextResponse.json({ jobs, next_offset });
+    return NextResponse.json({ jobs, next_offset: offset });
   } catch (error) {
     console.error("Error searching jobs:", error);
     return NextResponse.json({ code: 500, message: "Internal Server Error" }, { status: 500 });

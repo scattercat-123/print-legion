@@ -28,7 +28,7 @@ export async function searchJobs({
 
     return {
       data: json.records
-        .map((record: any) => {
+        .map((record: { fields: Record<string, unknown>; id: string }) => {
           const parsed = JobSchema.safeParse(record.fields);
           if (!parsed.success) {
             console.error("Failed to parse job record:", parsed.error.message);

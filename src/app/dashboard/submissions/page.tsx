@@ -14,7 +14,7 @@ export default async function SubmissionsPage() {
     redirect("/");
   }
 
-  const { data: jobs, offset: next_offset } = await cached_searchJobs({
+  const { data: jobs } = await cached_searchJobs({
     formula: `{(auto)(creator)slack_id} = '${session.user.id}'`,
   });
 
@@ -22,7 +22,7 @@ export default async function SubmissionsPage() {
     return (
       <Notice variant="default" title="No results" icon={MessageCircleQuestion}>
         Seems like we couldn&apos;t find any submissions on your account. Maybe
-        it's time to{" "}
+        it&apos;s time to{" "}
         <Link
           href="/dashboard/jobs/create"
           className="underline hover:text-primary transition-colors"

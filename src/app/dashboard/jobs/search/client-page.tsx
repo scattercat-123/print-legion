@@ -59,7 +59,10 @@ export default function SearchPage({ user }: { user: User }) {
           icon={MessageCircleQuestion}
         >
           {debouncedQuery.length > 0 ? (
-            "Seems like we couldn&apos;t find any results for your search - try a different search term?"
+            <>
+              Seems like we couldn&apos;t find any results for your search - try
+              a different search term?
+            </>
           ) : (
             <span>
               Seems like we couldn&apos;t find any jobs in your area - maybe ask

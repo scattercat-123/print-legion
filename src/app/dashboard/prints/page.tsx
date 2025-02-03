@@ -12,15 +12,15 @@ export default async function PrintsPage() {
     redirect("/");
   }
 
-  const { data: jobs, offset: next_offset } = await searchJobs({
+  const { data: jobs } = await searchJobs({
     formula: `{(auto)(assigned_printer)slack_id} = '${session.user.id}'`,
   });
 
   if (jobs.length === 0) {
     return (
       <Notice variant="default" title="No results" icon={MessageCircleQuestion}>
-        Seems like we couldn&apos;t find any prints on your account. Maybe it's
-        time to{" "}
+        Seems like we couldn&apos;t find any prints on your account. Maybe
+        it&apos;s time to{" "}
         <Link
           href="/dashboard/jobs/search"
           className="underline hover:text-primary transition-colors"
