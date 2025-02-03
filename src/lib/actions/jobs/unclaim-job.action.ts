@@ -27,7 +27,7 @@ export async function unclaimJob(jobId: string) {
 
   // Update the job record
   const success = await updateBySlackId("job", jobId, {
-    assigned_printer: undefined,
+    assigned_printer: [],
     status: "needs_printer" as JobStatusType,
   });
 
