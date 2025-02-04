@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: sharedTitle,
     images: [
       {
-        url: "https://printlegion.hackclub.com/assets/media/og_image.v1.png", // Must be an absolute URL
+        url: "https://printlegion.hackclub.com/media/og_image.v1.png", // Must be an absolute URL
         width: 1200,
         height: 630,
       },
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: sharedTitle,
     description: sharedDescription,
-    images: ["https://printlegion.hackclub.com/assets/media/og_image.v1.png"], // Must be an absolute URL
+    images: ["https://printlegion.hackclub.com/media/og_image.v1.png"], // Must be an absolute URL
   },
 };
 
