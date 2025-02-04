@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { InfinityIcon } from "lucide-react";
 import { z } from "zod";
+import { ThemePicker } from "@/components/theme-picker";
 
 export default function SettingsPage({ settingsData }: { settingsData: User }) {
   return (
@@ -241,6 +242,18 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
                 <>Pick how far you&apos;d like to see prints from in search.</>
               )}
             </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Theme
+            </label>
+            <div className="flex items-center gap-2">
+              <ThemePicker />
+              <p className="text-xs text-zinc-400">
+                Choose your preferred theme mode.
+              </p>
+            </div>
           </div>
 
           <div>

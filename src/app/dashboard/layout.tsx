@@ -95,9 +95,9 @@ export default async function DashboardLayout({
   return (
     <OnboardingProvider user={user}>
       <SidebarProvider defaultOpen>
-        <div className="flex min-h-screen bg-black w-full" data-theme="dark">
+        <div className="flex min-h-screen bg-background w-full">
           <DashboardSidebar navItems={navItems} />
-          <main className="flex-1 rounded-xl bg-black w-full">
+          <main className="flex-1 rounded-xl bg-background w-full">
             <div className="flex items-center border-b p-1 h-[2.55rem]">
               <SidebarTrigger />
               {/* todo: figure out what to put here in the future lol but calm for now */}
