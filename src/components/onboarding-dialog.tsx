@@ -188,6 +188,16 @@ const PrinterConfigStep = ({ onNext, onBack }: StepProps) => {
                   if (value === "6" || value.toLowerCase() === "back") {
                     onBack?.();
                   } else {
+                    if (Number.isNaN(Number.parseInt(value))) {
+                      const foundIndex = PRINTER_BRANDS.map((b) =>
+                        b.toLowerCase()
+                      ).indexOf(value.toLowerCase());
+                      if (foundIndex !== -1) {
+                        setPrinterBrand(PRINTER_BRANDS[foundIndex]);
+                        setConfigStep("volume");
+                        setInputValue("");
+                      }
+                    }
                     const index = Number.parseInt(value) - 1;
                     if (index >= 0 && index < PRINTER_BRANDS.length) {
                       setPrinterBrand(PRINTER_BRANDS[index]);
@@ -362,20 +372,20 @@ const LocationSearchStep = ({ onNext, onBack }: StepProps) => {
           {locationOptions.length === 1 ? `1` : `1-${locationOptions.length}`})
           select a location
         </p>
-        <p className="text-primary">5) search - search locations again</p>
-        <p className="text-primary">6) back - previous step</p>
+        <p className="text-primary">6) search - search locations again</p>
+        <p className="text-primary">7) back - previous step</p>
         <CommandInput
           value={commandValue}
           onChange={(e) => setCommandValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               const value = (e.target as HTMLInputElement).value.toLowerCase();
-              if (value === "5" || value === "search") {
+              if (value === "6" || value === "search") {
                 setMode("search");
                 setSearchValue("");
                 setCommandValue("");
                 setLocationOptions([]);
-              } else if (value === "6" || value === "back") {
+              } else if (value === "7" || value === "back") {
                 onBack?.();
               } else {
                 const numValue = Number.parseInt(value, 10);

@@ -35,7 +35,7 @@ export default async function SubmissionsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Your Submissions</h1>
       <div className="grid gap-2">
         {jobs.map((job) => (

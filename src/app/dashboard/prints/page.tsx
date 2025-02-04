@@ -33,7 +33,7 @@ export default async function PrintsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Your Prints</h1>
       <div className="grid gap-2">
         {jobs.map((job) => (

@@ -41,7 +41,7 @@ export default function DashboardPage({
     <div className="space-y-4 max-w-7xl mx-auto pb-8">
       {/* Welcome Section */}
       <div className="bg-gradient-to-br from-purple-300 to-purple-900 rounded-lg text-white relative">
-        <div className="absolute w-full h-full block bg-black/30"></div>
+        <div className="absolute w-full h-full block bg-black/15 dark:bg-black/30 rounded-lg"></div>
         <div className="flex flex-col p-10">
           <h1 className="text-3xl font-bold mb-2 z-10">
             Welcome back, {session?.user?.name?.split(" ")[0]}!

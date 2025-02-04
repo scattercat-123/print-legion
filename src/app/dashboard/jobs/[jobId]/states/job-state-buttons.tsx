@@ -11,6 +11,7 @@ import {
   ConfirmFulfillmentButton,
 } from "./fulfillment-buttons";
 import type { JobStatusType } from "@/lib/types";
+import { max_meetup_distance_km } from "@/lib/consts";
 
 interface JobStateButtonsProps {
   jobId: string;
@@ -18,6 +19,7 @@ interface JobStateButtonsProps {
   isMyJob: boolean;
   isPrinting: boolean;
   hasPrinter: boolean;
+  distance: number | undefined;
   onStateChange?: () => void;
   onError?: (error: Error) => void;
 }
@@ -28,6 +30,7 @@ export function JobStateButtons({
   isMyJob,
   isPrinting,
   hasPrinter,
+  distance,
   onStateChange,
   onError,
 }: JobStateButtonsProps) {
@@ -50,7 +53,11 @@ export function JobStateButtons({
     // If I'm a printer
     if (hasPrinter) {
       // Initial state - can claim if not claimed
-      if (status === "needs_printer") {
+      if (
+        status === "needs_printer" &&
+        distance != undefined &&
+        distance < max_meetup_distance_km
+      ) {
         return (
           <ClaimButton
             jobId={jobId}
