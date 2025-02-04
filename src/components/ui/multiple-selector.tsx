@@ -463,10 +463,11 @@ const MultipleSelector = React.forwardRef<
               return (
                 <Badge
                   key={option.value}
+                  variant="outline"
                   className={cn(
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                     "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
-                    option.img_url && "pl-1",
+                    option.img_url && "pl-0.5 pr-1",
                     maxSelected === 1 &&
                       "bg-transparent p-0 hover:bg-transparent text-foreground text-sm font-normal",
                     badgeClassName
