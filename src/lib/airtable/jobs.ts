@@ -6,10 +6,12 @@ export async function searchJobs({
   formula,
   offset,
   pageSize = 50,
+  throwOnError = false,
 }: {
   formula?: string;
   offset?: string;
   pageSize?: number;
+  throwOnError?: boolean;
 }) {
   try {
     const base_url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}`;
@@ -18,13 +20,20 @@ export async function searchJobs({
     if (offset) query.set("offset", offset);
     if (pageSize) query.set("pageSize", pageSize.toString());
 
-    const records = await fetch(`${base_url}/${JOBS_TABLE_NAME}?${query.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-      },
-    });
+    const records = await fetch(
+      `${base_url}/${JOBS_TABLE_NAME}?${query.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        },
+      }
+    );
 
     const json = await records.json();
+
+    if (json.error) {
+      throw new Error(`${json.error.type}: ${json.error.message}`);
+    }
 
     return {
       data: json.records
@@ -40,6 +49,9 @@ export async function searchJobs({
       offset: json.offset ?? undefined,
     };
   } catch (error) {
+    if (throwOnError) {
+      throw error;
+    }
     console.error("Error searching jobs:", error);
     return {
       data: [],
