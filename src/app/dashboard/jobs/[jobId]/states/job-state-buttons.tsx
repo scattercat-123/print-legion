@@ -55,7 +55,7 @@ export function JobStateButtons({
       // Initial state - can claim if not claimed
       if (
         status === "needs_printer" &&
-        distance != undefined &&
+        distance !== undefined &&
         distance < max_meetup_distance_km
       ) {
         return (
