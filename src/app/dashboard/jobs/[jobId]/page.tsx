@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ImageCarousel, SlackCard } from "./client-components";
 import { JobStateButtons } from "./states/job-state-buttons";
-import { STATUS_AESTHETIC } from "@/lib/consts";
+import { max_meetup_distance_km, STATUS_AESTHETIC } from "@/lib/consts";
 import { cached_getById } from "../../layout";
 import { getSlackUserInfo, SlackUserInfo } from "@/lib/slack";
 import { lazy } from "react";
@@ -93,10 +93,23 @@ export default async function JobPage({
               </Badge>
             )}
 
-            {job.distance !== undefined && job.distance > 0.0 && (
-              <Badge variant="secondary-static" className="text-xs pl-1.5">
-                <MapPin className="size-[0.875rem] shrink-0 mr-0.5" />~
-                {job.distance.toFixed(1)} km
+            {job.distance !== undefined && (
+              <Badge
+                variant="secondary-static"
+                className={cn(
+                  "text-xs px-1.5",
+                  job.distance < max_meetup_distance_km / 2 &&
+                    "text-emerald-200 bg-emerald-600/20",
+                  job.distance > max_meetup_distance_km / 2 &&
+                    "text-orange-200 bg-orange-600/20",
+                  job.distance > max_meetup_distance_km &&
+                    "text-red-200 bg-red-600/20"
+                )}
+              >
+                <MapPin className="size-[0.875rem] shrink-0 mr-1" />
+                {job.distance === 0.0
+                  ? "Nearby"
+                  : `~${job.distance.toFixed(0)} km`}
               </Badge>
             )}
           </div>
@@ -204,6 +217,17 @@ export default async function JobPage({
         <SlackCard title="Assigned printer" promise={printerDataPromise} />
       )}
 
+      {hasPrinter &&
+        job.status === "needs_printer" &&
+        job.distance !== undefined &&
+        job.distance > max_meetup_distance_km && (
+          <span className="flex text-sm text-muted-foreground mt-4 max-w-xl">
+            Hmm - Seems like you are too far away from the submitter to claim
+            this job. For now, we only do meetups, for which the job needs to be
+            within {max_meetup_distance_km} km...
+          </span>
+        )}
+
       <div className="flex flex-wrap gap-2 pt-4">
         <JobStateButtons
           jobId={jobId}
@@ -211,6 +235,7 @@ export default async function JobPage({
           isMyJob={isMyJob}
           isPrinting={isPrinting}
           hasPrinter={hasPrinter}
+          distance={job.distance}
         />
       </div>
     </div>

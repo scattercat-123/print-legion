@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { Badge } from "./ui/badge";
 import { ArrowUpRightIcon, Github, MapPin } from "lucide-react";
-import { STATUS_AESTHETIC } from "@/lib/consts";
+import { max_meetup_distance_km, STATUS_AESTHETIC } from "@/lib/consts";
 
 interface JobCardProps {
   job: Job & { id: string; distance?: number };
@@ -32,6 +32,9 @@ function JobCardComponent({ job, className }: JobCardProps) {
     <div
       className={cn(
         "p-4 bg-card border border-border hover:border-zinc-700 transition-all flex gap-2 rounded-xl",
+        job.distance !== undefined &&
+          job.distance > max_meetup_distance_km &&
+          "border-dashed",
         className
       )}
     >
@@ -85,11 +88,22 @@ function JobCardComponent({ job, className }: JobCardProps) {
               )}
 
               {job.distance !== undefined && (
-                <Badge variant="secondary-static" className="text-xs px-1.5">
+                <Badge
+                  variant="secondary-static"
+                  className={cn(
+                    "text-xs px-1.5",
+                    job.distance < max_meetup_distance_km / 2 &&
+                      "text-emerald-200 bg-emerald-600/20",
+                    job.distance > max_meetup_distance_km / 2 &&
+                      "text-orange-200 bg-orange-600/20",
+                    job.distance > max_meetup_distance_km &&
+                      "text-red-200 bg-red-600/20"
+                  )}
+                >
                   <MapPin className="size-[0.875rem] shrink-0 mr-1" />
                   {job.distance === 0.0
                     ? "Nearby"
-                    : `~${job.distance.toFixed(1)} km`}
+                    : `~${job.distance.toFixed(0)} km`}
                 </Badge>
               )}
             </div>
