@@ -525,7 +525,7 @@ function PureCreateJobPage() {
             </li>
             <li>
               You&apos;ll communicate with the person who prints your job via
-              Slack to arrange pickup. to arrange pickup.
+              Slack to arrange pickup.
             </li>
           </ul>
         </div>
