@@ -167,7 +167,7 @@ export const SlackCard = ({
                     {slackUser.real_name}
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    @{slackUser.name}
+                    @{slackUser.profile.display_name_normalized}
                   </p>
                 </div>
               </div>
