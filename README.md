@@ -1,7 +1,6 @@
 ![print_legion](https://raw.githubusercontent.com/hackclub/print-legion/refs/heads/v2/public/media/github_banner.v1.png)
-<center style="font-size: 24px; font-weight: bold;">Get 3D-printed parts from your local hack-clubbers!</center>
+<h2 align=center>Get 3D-printed parts from your local hack-clubbers!</h2>
 
----
 [![](https://img.shields.io/github/stars/hackclub/print-legion?style=flat-square&logo=github)](https://github.com/hackclub/print-legion) [![](https://img.shields.io/badge/website-print__legion.hackclub.com-red?style=flat-square)](https://printlegion.hackclub.com) [![](https://img.shields.io/badge/slack-%23print--legion-blue?logo=slack&style=flat-square)](https://hackclub.slack.com/archives/C083P4FJM46)
 
 
