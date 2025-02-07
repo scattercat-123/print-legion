@@ -245,9 +245,7 @@ function PureSettingsPage({ settingsData }: { settingsData: User }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Theme
-            </label>
+            <span className="block text-sm font-medium mb-2">Theme</span>
             <div className="flex items-center gap-2">
               <ThemePicker />
               <p className="text-xs text-zinc-400">
