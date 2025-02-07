@@ -16,7 +16,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LogOutIcon, PrinterIcon } from "lucide-react";
+import {
+  ArrowUpRightIcon,
+  GithubIcon,
+  LogOutIcon,
+  PrinterIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 interface DashboardSidebarProps {
@@ -86,6 +91,22 @@ export function DashboardSidebar({ navItems }: DashboardSidebarProps) {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip={"GitHub"}>
+              <a
+                href="https://github.com/hackclub/print-legion"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GithubIcon className="w-5 h-5 shrink-0" />
+                <span>Fork on GitHub</span>
+                <div className="flex-grow" />
+                <ArrowUpRightIcon className="w-4 h-4 shrink-0" />
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip={"Logout"}>
               <button type="button" onClick={() => signOut()}>
