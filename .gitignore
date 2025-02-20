@@ -47,3 +47,4 @@ certificates
 .env
 
 __pycache__
+local.db

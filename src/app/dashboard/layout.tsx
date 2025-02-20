@@ -5,6 +5,7 @@ import {
   ArrowUpToLine,
   Printer,
   HomeIcon,
+  BarChart3Icon,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getById } from "@/lib/airtable";
@@ -69,6 +70,13 @@ export const computeNavItems = (user: User) => {
           },
         ]
       : []),
+
+    {
+      href: "/dashboard/stats",
+      title: "Network Stats",
+      icon: <BarChart3Icon className="w-5 h-5" />,
+      color: "bg-blue-500",
+    },
     {
       href: "/dashboard/settings",
       title: "Settings",

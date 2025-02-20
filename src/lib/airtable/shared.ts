@@ -19,7 +19,7 @@ export async function getById<T extends "job" | "user", R extends boolean>(
     includeSensitiveFields?: boolean;
     coordinatesForDistance?: string;
     throwOnNotFound?: R;
-  } = {}
+  } = {},
 ): Promise<GetByIdReturn<T, R>> {
   if (!id) {
     if (throwOnNotFound) {
@@ -50,9 +50,7 @@ export async function getById<T extends "job" | "user", R extends boolean>(
       record = await jobsTable.find(id);
     }
 
-    const parsed = (type === "job" ? JobSchema : UserSchema).safeParse(
-      record.fields
-    );
+    const parsed = (type === "job" ? JobSchema : UserSchema).safeParse(record.fields);
     if (!parsed.success) {
       console.error("Failed to parse record:", parsed.error);
       return null as GetByIdReturn<T, R>;
@@ -61,16 +59,9 @@ export async function getById<T extends "job" | "user", R extends boolean>(
 
     if (type === "job") {
       const coords = record.fields["(auto)(creator)region_coordinates"];
-      if (
-        coordinatesForDistance &&
-        coords &&
-        (coords as string[]).length >= 1
-      ) {
+      if (coordinatesForDistance && coords && (coords as string[]).length >= 1) {
         Object.assign(final, {
-          distance: getDistance(
-            coordinatesForDistance,
-            (coords as string[])[0]
-          ),
+          distance: getDistance(coordinatesForDistance, (coords as string[])[0]),
         });
       }
 
@@ -79,9 +70,7 @@ export async function getById<T extends "job" | "user", R extends boolean>(
       }
     }
 
-    return final as unknown as (T extends "job"
-      ? Job & { distance?: number }
-      : User) & {
+    return final as unknown as (T extends "job" ? Job & { distance?: number } : User) & {
       id: string;
     };
   } catch (error) {
@@ -95,7 +84,7 @@ export async function getById<T extends "job" | "user", R extends boolean>(
 
 export async function createRecord<T extends "job" | "user">(
   type: T,
-  data: Partial<T extends "job" ? Job : User>
+  data: Partial<T extends "job" ? Job : User>,
 ): Promise<{ success: boolean; id?: string }> {
   try {
     const table = type === "job" ? jobsTable : usersTable;
@@ -110,7 +99,7 @@ export async function createRecord<T extends "job" | "user">(
 export async function updateBySlackId<T extends "job" | "user">(
   type: T,
   id: string,
-  data: Partial<T extends "job" ? Job : User>
+  data: Partial<T extends "job" ? Job : User>,
 ) {
   try {
     let foundId: string;
@@ -137,5 +126,47 @@ export async function updateBySlackId<T extends "job" | "user">(
   } catch (error) {
     console.error("Error updating record:", error);
     return false;
+  }
+}
+
+// Search helper
+export async function searchAll<T extends "users" | "jobs">({
+  table,
+  formula,
+  throwOnError = false,
+}: {
+  table: T;
+  formula?: string;
+  throwOnError?: boolean;
+}) {
+  try {
+    const _table = table === "users" ? usersTable : jobsTable;
+    const records = await _table
+      .select({
+        filterByFormula: formula ?? undefined,
+      })
+      .all();
+
+    return {
+      data: records
+        .map((record: { fields: FieldSet; id: string }) => {
+          const schema = table === "users" ? UserSchema : JobSchema;
+          const parsed = schema.safeParse(record.fields);
+          if (!parsed.success) {
+            console.error(`Failed to parse ${table} record:`, parsed.error.message);
+            return null;
+          }
+          return { ...parsed.data, id: record.id };
+        })
+        .filter(Boolean) as (T extends "users" ? User & { id: string } : Job & { id: string })[],
+    };
+  } catch (error) {
+    if (throwOnError) {
+      throw error;
+    }
+    console.error(`Error searching ${table}:`, error);
+    return {
+      data: [],
+    };
   }
 }

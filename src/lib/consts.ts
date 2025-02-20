@@ -40,3 +40,5 @@ export const getDistanceColor = (distance: number) => {
   }
   return "text-emerald-600 bg-emerald-400/20 dark:text-emerald-200 dark:bg-emerald-600/20";
 };
+
+export const GLOBAL_STAT_ID = 1;
