@@ -41,7 +41,7 @@ export default function FAQClientPage() {
         Frequently Asked Questions
       </h1>
       <p className="text-sm text-muted-foreground mb-4">
-        For those of you who don't read the pins
+        For those of you who don&apos;t read the pins
       </p>
       <Accordion type="single" collapsible>
         {Object.entries(FAQ_ITEMS).map(([key, { title, content }]) => (
