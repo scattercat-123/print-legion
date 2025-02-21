@@ -64,6 +64,10 @@
         "tsx": "^4.19.3",
         "typescript": "^5",
       },
+      "peerDependencies": {
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+      },
     },
   },
   "packages": {
