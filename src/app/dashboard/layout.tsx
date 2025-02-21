@@ -5,6 +5,8 @@ import {
   ArrowUpToLine,
   Printer,
   HomeIcon,
+  Circle,
+  Book,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getById } from "@/lib/airtable";
@@ -60,15 +62,9 @@ export const computeNavItems = (user: User) => {
       color: "bg-red-500",
     },
     {
-      href: "/dashboard/stats",
-      title: "Stats",
-      icon: <ArrowUpToLine className="w-5 h-5" />,
-      color: "bg-orange-500",
-    },
-    {
       href: "/dashboard/faq",
       title: "FAQ",
-      icon: <circle className="w-5 h-5" />,
+      icon: <Book className="w-5 h-5" />,
       color: "bg-blue-500",
     },
     ...(!user?.printer_has
