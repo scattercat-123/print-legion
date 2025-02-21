@@ -6,6 +6,7 @@ import {
   Printer,
   HomeIcon,
   BarChart3Icon,
+  Book,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getById } from "@/lib/airtable";
@@ -59,6 +60,12 @@ export const computeNavItems = (user: User) => {
       title: "Search Prints",
       icon: <Search className="w-5 h-5" />,
       color: "bg-red-500",
+    },
+    {
+      href: "/dashboard/faq",
+      title: "FAQ",
+      icon: <Book className="w-5 h-5" />,
+      color: "bg-blue-500",
     },
     ...(!user?.printer_has
       ? [
