@@ -1,5 +1,5 @@
-import StatsClientPage from "./client-page.tsx";
+import FAQClientPage from "./client-page";
 
-export default function StatsPage() {
-  return <StatsClientPage />;
+export default function FAQPage() {
+  return <FAQClientPage />;
 }
